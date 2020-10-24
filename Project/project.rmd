@@ -6,8 +6,8 @@ output: html_document
 ---
 
 # Loading Packages 
-```{r}
-packages = c('sp', 'rgdal', 'rgeos', 'sf', 'tidyverse')
+```{r echo=TRUE, warning= FALSE}
+packages = c('sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse')
 for (p in packages){
   if(!require(p, character.only = T)){
     install.packages(p)
@@ -15,3 +15,67 @@ for (p in packages){
   library(p,character.only = T)
 }
 ```
+
+# Importing Datasets
+CSV File: Resale flat Prices (2017 onwards)
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+resale_flat = st_read("data/aspatial/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
+```
+
+kml Files: 
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+preschool = st_read("data/geospatial/pre-schools-location-kml.kml")
+
+hawkercenter = st_read("data/geospatial/hawker-centres-kml.kml")
+
+cc = st_read("data/geospatial/community-clubs-kml.kml")
+
+parks = st_read("data/geospatial/nparks-parks-kml.kml")
+
+supermarket = st_read("data/geospatial/supermarkets-kml.kml")
+
+sport_facilities = st_read("data/geospatial/sportsg-sport-facilities-kml.kml")
+
+Sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-kml.kml")
+
+```
+
+Shapefile : 
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+library(raster)
+mrt <- shapefile("data/geospatial/MRTLRTStnPtt.shp")
+```
+
+
+# Updating CRS information
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+preschool_svy21 <- st_transform(preschool,3414)
+st_crs(preschool_svy21)
+
+hawkercenter_svy21 <- st_transform(hawkercenter, 3414)
+st_crs(hawkercenter_svy21)
+
+cc_svy21 <- st_transform(cc, 3414)
+st_crs(cc_svy21)
+
+parks_svy21 <- st_transform(parks, 3414)
+st_crs(parks_svy21)
+
+supermarket_svy21 <- st_transform(supermarket, 3414)
+st_crs(supermarket_svy21)
+
+sport_facilities_svy21 <- st_transform(sport_facilities, 3414)
+st_crs(sport_facilities_svy21)
+
+mpsz2019_svy21 <- st_transform(Sf_mpsz2019, 3414)
+st_crs(mpsz2019_svy21)
+
+```
+
+
+# Filter resale flat data to yr 2020 
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+resale_flat_2020 <- resale_flat %>%
+  filter()
+```
+
