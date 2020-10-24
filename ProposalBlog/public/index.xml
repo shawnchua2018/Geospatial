@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>My New Hugo Site</title>
+    <link>http://example.org/</link>
+    <description>Recent content on My New Hugo Site</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 24 Oct 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>$patial Proposal</title>
+      <link>http://example.org/post/2020-10-24-patial-proposal/proposal/</link>
+      <pubDate>Sat, 24 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2020-10-24-patial-proposal/proposal/</guid>
+      <description>Title
+$patial - an application to allow users to visualise the effects of spatial autocorrelation between attributes used in determining resale price of flats
+Motivation
+Public housing in Singapore is uniquely different, the flats are home to over 80% of the Singapore citizens of which 90% own their own homes. Over the years, policymakers, town planners have placed great emphasis on modelling housing prices as a Housing Development Board (HDB) flat is one of the largest financial commitments for Singapore citizens.</description>
+    </item>
+    
+  </channel>
+</rss>
