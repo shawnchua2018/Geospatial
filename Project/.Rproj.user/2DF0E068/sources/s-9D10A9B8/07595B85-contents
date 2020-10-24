@@ -1,0 +1,26 @@
+---
+title: "Project"
+author: "Chua Jun Yong Shawn"
+date: "10/24/2020"
+output: 
+  html_document:
+    theme: readable
+    highlight: monochrome
+    toc: true
+    toc_float: true
+    toc_depth: 6
+    code_folding: show
+    number_section: true
+    fig.width : 7
+    fig.height : 6
+---
+
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+packages = c('rgdal', 'sf', 'spdep', 'tmap', 'tidyverse')
+for (p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p,character.only = T)
+}
+```

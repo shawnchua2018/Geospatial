@@ -1,0 +1,1736 @@
+---
+title: "Take_Home_Assignment2"
+author: "Chua Jun Yong Shawn"
+date: "10/5/2020"
+output: 
+  html_document:
+    theme: readable
+    highlight: monochrome
+    toc: true
+    toc_float: true
+    toc_depth: 6
+    code_folding: show
+    number_section: true
+    fig.width : 7
+    fig.height : 6
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+**Context of this assignment**
+Since late December 2019, an outbreak of a novel coronavirus disease (COVID-19; previously known as 2019-nCoV) was reported in Wuhan, China, which has subsequently affected 210 countries worldwide. In general, COVID-19 is an acute resolved disease but it can also be deadly, with a 2% case fatality rate.
+The COVID-19 pandemic in Mexico is part of the ongoing worldwide pandemic of coronavirus disease 2019 (COVID-19) caused by severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2). The virus was confirmed to have reached Mexico in February 2020. However, the National Council of Science and Technology (CONACYT) reported two cases of COVID-19 in mid-January 2020 in the states of Nayarit and Tabasco, one case per state. As of September 26, there had been 726,431 confirmed cases of COVID-19 in Mexico and 76,243 reported deaths, although the Secretariat of Health, through the "Programa Centinela" (Spanish for "Sentinel Program") estimated in mid July 2020 that there were more than 2,875,734 cases in Mexico, because they were considering the total number of cases confirmed as a statistical sample. (Note: This paragraph is extracted from wiki: https://en.wikipedia.org/wiki/COVID-19_pandemic_in_Mexico).
+
+**Objective**
+This assignment aims to analyze the spatio-temporal patterns of COVID-19 cases in Central Mexico over a given period of time.
+
+The Data set used for this analysis contains reported COVID-19 cases and other related data at the municipality level and is obtained from Secretary of Health (Spanish: Secretaría de Salud), Government of Mexico homepage’s (http://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/).
+
+As Central Mexico comprises of Mexico City, Mexico State and Morelos State, and their respective CVE_ENT code is 09, 15 and 17, these states will be filtered out to become the study area of this analysis. Additionally, the study period of this analysis will be over weeks 13 to 32, therefore data before week 13 will be ignored in this analysis. 
+Additionally, these cases recorded are from the period of January 2020 until August 2020, I will be grouping these weekly data by their respective months.<br />
+April covers weeks 13 to 16 <br />
+May covers weeks 17 to 20 <br />
+June covers weeks 21 to 24 <br />
+July covers weeks 25 to 28 <br />
+August covers weeks 29 to 32 <br />
+
+**Contents of this report**
+Part 1 : Data wrangling to obtain study area (Central Mexico) and COVID-19 rate (i.e. cases per 10000 population) from e-week 13 until e-week 32
+
+Part 2: Show the spatio-temporal distribution of COVID-19 rates at municipality level by using choropleth maps and describe the spatio-temporal patterns observed.
+
+Part 3: Perform local Moran’s I analysis and display the results by using appropriate thematic mapping techniques. Describe the spatio-temporal patterns reveal by the maps.
+
+Part 4: Perform local Getis-Ord Gi* analysis and display the results using appropriate thematic mapping techniques. Describe the spatio-temporal patterns reveal by the maps.
+
+# Importing of data and packages required
+
+**Loading packages required**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+packages = c('rgdal', 'sf', 'spdep', 'tmap', 'tidyverse')
+for (p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p,character.only = T)
+}
+```
+
+**Importing dataset**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+covid <- readOGR(dsn = "data/geospatial", layer = "municipalities_COVID")
+```
+
+# Part 1
+
+## Data wrangling - filtering study area, computing covid-19 rates, Exploratory data analysis
+
+**As mentioned in the introduction, data from CVE_ENT = 09,15 and 17 will be filtered out to become the study area (Central Mexico) of the following analysis.**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+covid <- subset(covid, `CVE_ENT` == '09' | `CVE_ENT` == '15' | `CVE_ENT` == '17')
+```
+
+### Study Area
+
+**Plotting study area, Central Mexico**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+covid_plot <- covid
+covid_plot@data <- covid_plot@data %>% 
+  mutate(`CVE_ENT` = ifelse(as.character(`CVE_ENT`) == "09", "Mexico City", as.character(`CVE_ENT`))) %>%
+  mutate(`CVE_ENT` = ifelse(as.character(`CVE_ENT`) == "15", "Mexico State", as.character(`CVE_ENT`))) %>%
+  mutate(`CVE_ENT` = ifelse(as.character(`CVE_ENT`) == "17", "Morelos State", as.character(`CVE_ENT`)))
+
+qtm(covid_plot, "CVE_ENT", title = "Central Mexico")
+```
+
+**Computing Covid-19 rates per 10000 population over weeks 13 to 32. This computation is done through the formula of:** <br />
+covid-19 rate = cumulative number of  cases per week/ (2020 population/10000)
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+covid@data <- covid@data %>%
+  mutate('rate13' = `cumul13`/(Pop2020/10000)) %>%
+  mutate('rate14' = `cumul14`/(Pop2020/10000)) %>%
+  mutate('rate15' = `cumul15`/(Pop2020/10000)) %>%
+  mutate('rate16' = `cumul16`/(Pop2020/10000)) %>%
+  mutate('rate17' = `cumul17`/(Pop2020/10000)) %>%
+  mutate('rate18' = `cumul18`/(Pop2020/10000)) %>%
+  mutate('rate19' = `cumul19`/(Pop2020/10000)) %>%
+  mutate('rate20' = `cumul20`/(Pop2020/10000)) %>%
+  mutate('rate21' = `cumul21`/(Pop2020/10000)) %>%
+  mutate('rate22' = `cumul22`/(Pop2020/10000)) %>%
+  mutate('rate23' = `cumul23`/(Pop2020/10000)) %>%
+  mutate('rate24' = `cumul24`/(Pop2020/10000)) %>%
+  mutate('rate25' = `cumul25`/(Pop2020/10000)) %>%
+  mutate('rate26' = `cumul26`/(Pop2020/10000)) %>%
+  mutate('rate27' = `cumul27`/(Pop2020/10000)) %>%
+  mutate('rate28' = `cumul28`/(Pop2020/10000)) %>%
+  mutate('rate29' = `cumul29`/(Pop2020/10000)) %>%
+  mutate('rate30' = `cumul30`/(Pop2020/10000)) %>%
+  mutate('rate31' = `cumul31`/(Pop2020/10000)) %>%
+  mutate('rate32' = `cumul32`/(Pop2020/10000))
+
+#Keeping relevant columns for further processing
+#Pop2020 is kept as Covid-19 happens in the year of 2020
+covid@data <- covid@data %>%
+  select(`CVEGEO`, `CVE_ENT`, `CVE_MUN`, `NOMGEO`, `Pop2020`, `rate13`, `rate14`, `rate15`, `rate16`, `rate17`, `rate18`, `rate19`, `rate20`, `rate21`, `rate22`, `rate23`, `rate24`, `rate25`, `rate26`, `rate27`, `rate28`, `rate29`, `rate30`, `rate31`, `rate32` )
+```
+
+### Line graph for covid-19 rates {.tabset}
+
+**Plotting line graph to see change in rates**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+covid_df_all <- covid@data %>%
+  select(`rate13`, `rate14`, `rate15`, `rate16`, `rate17`, `rate18`, `rate19`, `rate20`, `rate21`, `rate22`, `rate23`, `rate24`, `rate25`, `rate26`, `rate27`, `rate28`, `rate29`, `rate30`, `rate31`, `rate32` )%>%
+  summarise_all(funs(sum)) 
+
+covid_df_mc <- covid@data %>%
+  filter(`CVE_ENT` == "09")%>%
+  select(`rate13`, `rate14`, `rate15`, `rate16`, `rate17`, `rate18`, `rate19`, `rate20`, `rate21`, `rate22`, `rate23`, `rate24`, `rate25`, `rate26`, `rate27`, `rate28`, `rate29`, `rate30`, `rate31`, `rate32` )%>%
+  summarise_all(funs(sum)) 
+
+covid_df_ms <- covid@data %>%
+  filter(`CVE_ENT` == "15")%>%
+  select(`rate13`, `rate14`, `rate15`, `rate16`, `rate17`, `rate18`, `rate19`, `rate20`, `rate21`, `rate22`, `rate23`, `rate24`, `rate25`, `rate26`, `rate27`, `rate28`, `rate29`, `rate30`, `rate31`, `rate32` )%>%
+  summarise_all(funs(sum)) 
+
+covid_df_mor <- covid@data %>%
+  filter(`CVE_ENT` == "17")%>%
+  select(`rate13`, `rate14`, `rate15`, `rate16`, `rate17`, `rate18`, `rate19`, `rate20`, `rate21`, `rate22`, `rate23`, `rate24`, `rate25`, `rate26`, `rate27`, `rate28`, `rate29`, `rate30`, `rate31`, `rate32` )%>%
+  summarise_all(funs(sum)) 
+
+covid_df_all <- as.data.frame(t(covid_df_all))
+covid_df_mc <- as.data.frame(t(covid_df_mc))
+covid_df_ms <- as.data.frame(t(covid_df_ms))
+covid_df_mor <- as.data.frame(t(covid_df_mor))
+
+weeks <- c(13:32)
+
+plot_all <- ggplot(covid_df_all, aes(x = weeks, y = V1)) + 
+  ylab("Covid-19 rates per 10000 population") + 
+  ggtitle("Covid-19 rates in Central Mexico over weeks 13 to 32") +
+  geom_point() +
+  geom_line()
+
+plot_mc <- ggplot(covid_df_mc, aes(x = weeks, y = V1)) + 
+  ylab("Covid-19 rates per 10000 population") + 
+  ggtitle("Covid-19 rates in Mexico City over weeks 13 to 32") +
+  geom_point() +
+  geom_line()
+
+plot_ms <- ggplot(covid_df_ms, aes(x = weeks, y = V1)) + 
+  ylab("Covid-19 rates per 10000 population") + 
+  ggtitle("Covid-19 rates in Mexico State over weeks 13 to 32") +
+  geom_point() +
+  geom_line()
+
+plot_mor <- ggplot(covid_df_mor, aes(x = weeks, y = V1)) + 
+  ylab("Covid-19 rates per 10000 population") + 
+  ggtitle("Covid-19 rates in Merelos State over weeks 13 to 32") +
+  geom_point() +
+  geom_line()
+```
+
+#### Central Mexico
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+plot_all
+```
+
+#### Mexico City
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+plot_mc
+```
+
+#### Mexico State
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+plot_ms
+```
+
+#### Morelos State
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+plot_mor
+```
+
+### BOXMAP on Central Mexico
+
+**Creating required functions**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+boxbreaks <- function(v,mult=1.5) {
+  qv <- unname(quantile(v))
+  iqr <- qv[4] - qv[2]
+  upfence <- qv[4] + mult * iqr
+  lofence <- qv[2] - mult * iqr
+  # initialize break points vector
+  bb <- vector(mode="numeric",length=7)
+  # logic for lower and upper fences
+  if (lofence < qv[1]) { # no lower outliers
+    bb[1] <- lofence
+    bb[2] <- floor(qv[1])
+  } 
+  else {
+    bb[2] <- lofence
+    bb[1] <- qv[1]
+  }
+  if (upfence > qv[5]) { # no upper outliers
+    bb[7] <- upfence
+    bb[6] <- ceiling(qv[5])
+  } 
+  else {
+    bb[6] <- upfence
+    bb[7] <- qv[5]
+  }
+  bb[3:5] <- qv[2:4]
+  return(bb)
+}
+
+get.var <- function(vname,df) {
+  v <- df[vname] %>% st_set_geometry(NULL)
+  v <- unname(v[,1])
+  return(v)
+}
+
+boxmap <- function(vnam, df, legtitle=NA, mtitle="Box Map", mult=1.5){
+  df1 <- df %>% drop_na()
+  var <- get.var(vnam,df)
+  bb <- boxbreaks(var)
+  tm_shape(df) + 
+    tm_fill(vnam,title=legtitle,breaks=bb,palette="-RdBu",
+        labels = c("lower outlier", "< 25%", "25% - 50%", "50% - 75%","> 75%", "upper outlier")) + 
+    tm_borders() +  
+    tm_layout(title = mtitle, title.position = c("right","bottom"))
+  }
+```
+
+***Plotting boxmap for Total Covid rates***
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+covid_box <- covid
+covid_box <- st_as_sf(covid_box)
+var <- get.var('rate32', covid_box)
+#boxbreaks(var)
+boxmap('rate32', covid_box)
+```
+
+From this boxmap we can actually see that covid rates are the highest in the municipalities of Mexico City. To find out more on possible reasons for this distribution and how this distribution came about, we will use several other techniques to find out more on the spatio-temporal distributions later in this assignment.
+
+# Part 2
+
+## Plotting choropleth maps representing covid rates accross weeks 13 to 32
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+covid_rate13 <- tm_shape(covid) +
+  tm_fill(col = "rate13", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 13") +
+  tm_borders(alpha = 0.5)
+
+covid_rate14 <- tm_shape(covid) +
+  tm_fill(col = "rate14", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 14") +
+  tm_borders(alpha = 0.5)
+
+covid_rate15 <- tm_shape(covid) +
+  tm_fill(col = "rate15", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 15") +
+  tm_borders(alpha = 0.5)
+
+covid_rate16 <- tm_shape(covid) +
+  tm_fill(col = "rate16", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 16") +
+  tm_borders(alpha = 0.5)
+
+covid_rate17 <- tm_shape(covid) +
+  tm_fill(col = "rate17", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 17") +
+  tm_borders(alpha = 0.5)
+
+covid_rate18 <- tm_shape(covid) +
+  tm_fill(col = "rate18", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 18") +
+  tm_borders(alpha = 0.5)
+
+covid_rate19 <- tm_shape(covid) +
+  tm_fill(col = "rate19", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 19") +
+  tm_borders(alpha = 0.5)
+
+covid_rate20 <- tm_shape(covid) +
+  tm_fill(col = "rate20", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 20") +
+  tm_borders(alpha = 0.5)
+
+covid_rate21 <- tm_shape(covid) +
+  tm_fill(col = "rate21", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 21") +
+  tm_borders(alpha = 0.5)
+
+covid_rate22 <- tm_shape(covid) +
+  tm_fill(col = "rate22", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 22") +
+  tm_borders(alpha = 0.5)
+
+covid_rate23 <- tm_shape(covid) +
+  tm_fill(col = "rate23", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 23") +
+  tm_borders(alpha = 0.5)
+
+covid_rate24 <- tm_shape(covid) +
+  tm_fill(col = "rate24", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 24") +
+  tm_borders(alpha = 0.5)
+
+covid_rate25 <- tm_shape(covid) +
+  tm_fill(col = "rate25", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 25") +
+  tm_borders(alpha = 0.5)
+
+covid_rate26 <- tm_shape(covid) +
+  tm_fill(col = "rate26", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 26") +
+  tm_borders(alpha = 0.5)
+
+covid_rate27 <- tm_shape(covid) +
+  tm_fill(col = "rate27", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 27") +
+  tm_borders(alpha = 0.5)
+
+covid_rate28 <- tm_shape(covid) +
+  tm_fill(col = "rate28", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 28") +
+  tm_borders(alpha = 0.5)
+
+covid_rate29 <- tm_shape(covid) +
+  tm_fill(col = "rate29", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 29") +
+  tm_borders(alpha = 0.5)
+
+covid_rate30 <- tm_shape(covid) +
+  tm_fill(col = "rate30", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 30") +
+  tm_borders(alpha = 0.5)
+
+covid_rate31 <- tm_shape(covid) +
+  tm_fill(col = "rate31", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 31") +
+  tm_borders(alpha = 0.5)
+
+covid_rate32 <- tm_shape(covid) +
+  tm_fill(col = "rate32", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "Covid rate Week 32") +
+  tm_borders(alpha = 0.5)
+```
+
+### Month of April, weeks 13 to 16
+
+**Plotting Covid rates in April**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(covid_rate13, covid_rate14, covid_rate15, covid_rate16)
+```
+
+In April, it can be seen that the covid rates are prevalent near the regions of Mexico City with smaller clusters in the southern and south-western regions of Central Mexico in Week 13. However, over the course of the next 3 weeks, the the main cluster close to the middle have spread towards northern and eastern directions with increasing covid rates.
+
+### Month of May, weeks 17 to 20
+
+**Plotting Covid rates in May**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(covid_rate17, covid_rate18, covid_rate19, covid_rate20)
+```
+
+In May, the main cluster is still present however rates are increasing and we can see further spread in the southern direction where a new cluster is being formed.
+
+### Month of June, weeks 21 to 24
+
+**Plotting Covid rates in June**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(covid_rate21, covid_rate22, covid_rate23, covid_rate24)
+```
+
+In June, the main cluster is still present with increasing covid rates alongside the cluster in the southern regions. Additionally, the region on the western side of the main cluster seem to be having an increase in covid rates. However in Week 24, we can see that the cluster in the southern regions have started to slow down in the increase of covid rates.
+
+### Month of July, weeks 25 to 28
+
+**Plotting Covid rates in July**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(covid_rate25, covid_rate26, covid_rate27, covid_rate28)
+```
+
+In July, the main cluster is still present with increasing covid rates. However, the smaller clusters on the western and southern regions seem to be slowing down on the increase of covid rates.
+
+### Month of August, weeks 29 to 32
+
+**Plotting Covid rates in August**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(covid_rate29, covid_rate30, covid_rate31, covid_rate32)
+```
+
+In August, the main cluster is still present with increasing covid rates with all other clusters slowing down.
+
+# Part 3
+
+## Creating contiguity spatial weights
+
+**Creating (QUEEN) contiguity based neighbors, where all polygons around the source polygon is taken into account.**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+wm_q <- poly2nb(covid, queen=TRUE)
+summary(wm_q)
+#str(wm_q)
+xx <- poly2nb(covid)
+diffnb(wm_q, xx)
+```
+**Plotting Contiguity**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+plot(covid, border="lightgrey")
+plot(wm_q, coordinates(covid), pch = 19, cex = 0.6, add = TRUE, col= "red")
+```
+**Row-standardised weight matrix**<br />
+Row standardization is used to create proportional weights in cases where features have an unequal number of neighbors. Row standardization involves dividing each neighbor weight for a feature by the sum of all neighbor weights for that feature.<br />
+This would be appropriate for this analysis as states in Central Mexico vary in size and number of neighbors may differ greatly between states.
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+rswm_q <- nb2listw(wm_q, zero.policy = TRUE)
+summary(rswm_q)
+```
+## Computation of local Moran’s I for week 13 to 32 at state level
+
+**localmoran() function returns a matrix of values whose columns are:**<br />
+Ii: the local Moran’s I statistics<br />
+E.Ii: the expectation of local moran statistic under the randomization hypothesis<br />
+Var.Ii: the variance of local moran statistic under the randomization hypothesis<br />
+Z.Ii:the standard deviate of local moran statistic<br />
+Pr(): the p-value of local moran statistic<br />
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+fips <- order(covid$NOMGEO)
+localMI13 <- localmoran(covid$`rate13`, rswm_q)
+localMI14 <- localmoran(covid$`rate14`, rswm_q)
+localMI15 <- localmoran(covid$`rate15`, rswm_q)
+localMI16 <- localmoran(covid$`rate16`, rswm_q)
+localMI17 <- localmoran(covid$`rate17`, rswm_q)
+localMI18 <- localmoran(covid$`rate18`, rswm_q)
+localMI19 <- localmoran(covid$`rate19`, rswm_q)
+localMI20 <- localmoran(covid$`rate20`, rswm_q)
+localMI21 <- localmoran(covid$`rate21`, rswm_q)
+localMI22 <- localmoran(covid$`rate22`, rswm_q)
+localMI23 <- localmoran(covid$`rate23`, rswm_q)
+localMI24 <- localmoran(covid$`rate24`, rswm_q)
+localMI25 <- localmoran(covid$`rate25`, rswm_q)
+localMI26 <- localmoran(covid$`rate26`, rswm_q)
+localMI27 <- localmoran(covid$`rate27`, rswm_q)
+localMI28 <- localmoran(covid$`rate28`, rswm_q)
+localMI29 <- localmoran(covid$`rate29`, rswm_q)
+localMI30 <- localmoran(covid$`rate30`, rswm_q)
+localMI31 <- localmoran(covid$`rate31`, rswm_q)
+localMI32 <- localmoran(covid$`rate32`, rswm_q)
+```
+
+**Checking local Moran’s I values**
+```{r eval=FALSE, echo=TRUE, warning=FALSE, message=FALSE}
+head(localMI13)
+head(localMI14)
+head(localMI15)
+head(localMI16)
+head(localMI17)
+head(localMI18)
+head(localMI19)
+head(localMI20)
+head(localMI21)
+head(localMI22)
+head(localMI23)
+head(localMI24)
+head(localMI25)
+head(localMI26)
+head(localMI27)
+head(localMI28)
+head(localMI29)
+head(localMI30)
+head(localMI31)
+head(localMI32)
+```
+
+**The code chunk below list the content of the local Moran matrix derived by using printCoefmat().**
+```{r eval=FALSE, echo=TRUE, warning=FALSE, message=FALSE}
+printCoefmat(data.frame(localMI13[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI14[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI15[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI16[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI17[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI18[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI19[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI20[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI21[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI22[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI23[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI24[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI25[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI26[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI27[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI28[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI29[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI30[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI31[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+
+printCoefmat(data.frame(localMI32[fips,], row.names=covid$NOMGEO[fips]), check.names=FALSE)
+```
+
+**Appending local Moran I dataframe computed above onto covid SpatialPolygonDataFrame for plotting of local Moran I map later.**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+covid.localMI13 <- cbind(covid,localMI13)
+covid.localMI14 <- cbind(covid,localMI14)
+covid.localMI15 <- cbind(covid,localMI15)
+covid.localMI16 <- cbind(covid,localMI16)
+covid.localMI17 <- cbind(covid,localMI17)
+covid.localMI18 <- cbind(covid,localMI18)
+covid.localMI19 <- cbind(covid,localMI19)
+covid.localMI20 <- cbind(covid,localMI20)
+covid.localMI21 <- cbind(covid,localMI21)
+covid.localMI22 <- cbind(covid,localMI22)
+covid.localMI23 <- cbind(covid,localMI23)
+covid.localMI24 <- cbind(covid,localMI24)
+covid.localMI25 <- cbind(covid,localMI25)
+covid.localMI26 <- cbind(covid,localMI26)
+covid.localMI27 <- cbind(covid,localMI27)
+covid.localMI28 <- cbind(covid,localMI28)
+covid.localMI29 <- cbind(covid,localMI29)
+covid.localMI30 <- cbind(covid,localMI30)
+covid.localMI31 <- cbind(covid,localMI31)
+covid.localMI32 <- cbind(covid,localMI32)
+```
+
+**Mapping local Moran’s I values**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+Local_Moran_I_week_13 <- tm_shape(covid.localMI13) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 13") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_14 <- tm_shape(covid.localMI14) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 14") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_15 <- tm_shape(covid.localMI15) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 15") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_16 <- tm_shape(covid.localMI16) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 16") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_17 <- tm_shape(covid.localMI17) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 17") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_18 <- tm_shape(covid.localMI18) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 18") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_19 <- tm_shape(covid.localMI19) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 19") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_20 <- tm_shape(covid.localMI20) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 20") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_21 <- tm_shape(covid.localMI21) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 21") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_22 <- tm_shape(covid.localMI22) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 22") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_23 <- tm_shape(covid.localMI23) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 23") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_24 <- tm_shape(covid.localMI24) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 24") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_25 <- tm_shape(covid.localMI25) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 25") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_26 <- tm_shape(covid.localMI26) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 26") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_27 <- tm_shape(covid.localMI27) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 27") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_28 <- tm_shape(covid.localMI28) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 28") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_29 <- tm_shape(covid.localMI29) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 29") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_30 <- tm_shape(covid.localMI30) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 30") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_31 <- tm_shape(covid.localMI31) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 31") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_week_32 <- tm_shape(covid.localMI32) +
+  tm_fill(col = "Ii", 
+          style = "jenks",
+          palette = "YlOrRd",
+          title = "local moran statistics Week 32") +
+  tm_borders(alpha = 0.5)
+```
+
+**Mapping local Moran’s I p-values**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+Local_Moran_I_pvalue_week_13 <- tm_shape(covid.localMI13) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 13") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_14 <- tm_shape(covid.localMI14) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 14") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_15 <- tm_shape(covid.localMI15) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 15") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_16 <- tm_shape(covid.localMI16) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 16") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_17 <- tm_shape(covid.localMI17) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 17") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_18 <- tm_shape(covid.localMI18) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 18") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_19 <- tm_shape(covid.localMI19) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 19") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_20 <- tm_shape(covid.localMI20) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 20") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_21 <- tm_shape(covid.localMI21) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 21") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_22 <- tm_shape(covid.localMI22) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 22") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_23 <- tm_shape(covid.localMI23) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 23") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_24 <- tm_shape(covid.localMI24) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 24") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_25 <- tm_shape(covid.localMI25) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 25") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_26 <- tm_shape(covid.localMI26) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 26") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_27 <- tm_shape(covid.localMI27) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 27") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_28 <- tm_shape(covid.localMI28) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 28") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_29 <- tm_shape(covid.localMI29) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 29") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_30 <- tm_shape(covid.localMI30) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 30") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_31 <- tm_shape(covid.localMI31) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 31") +
+  tm_borders(alpha = 0.5)
+
+Local_Moran_I_pvalue_week_32 <- tm_shape(covid.localMI32) +
+  tm_fill(col = "Pr.z...0.", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values Week 32") +
+  tm_borders(alpha = 0.5)
+```
+
+## Plotting Moran's I statics and p-values by weeks for effective comparison {.tabset}
+
+### Week 13 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_13, Local_Moran_I_pvalue_week_13)
+```
+
+### Week 14 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_14, Local_Moran_I_pvalue_week_14)
+```
+
+### Week 15 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_15, Local_Moran_I_pvalue_week_15)
+```
+
+### Week 16 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_16, Local_Moran_I_pvalue_week_16)
+```
+
+### Week 17 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_17, Local_Moran_I_pvalue_week_17)
+```
+
+### Week 18 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_18, Local_Moran_I_pvalue_week_18)
+```
+
+### Week 19 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_19, Local_Moran_I_pvalue_week_19)
+```
+
+### Week 20 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_20, Local_Moran_I_pvalue_week_20)
+```
+
+### Week 21 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_21, Local_Moran_I_pvalue_week_21)
+```
+
+### Week 22 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_22, Local_Moran_I_pvalue_week_22)
+```
+
+### Week 23 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_23, Local_Moran_I_pvalue_week_23)
+```
+
+### Week 24 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_24, Local_Moran_I_pvalue_week_24)
+```
+
+### Week 25 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_25, Local_Moran_I_pvalue_week_25)
+```
+
+### Week 26 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_26, Local_Moran_I_pvalue_week_26)
+```
+
+### Week 27 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_27, Local_Moran_I_pvalue_week_27)
+```
+
+### Week 28 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_28, Local_Moran_I_pvalue_week_28)
+```
+
+### Week 29 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_29, Local_Moran_I_pvalue_week_29)
+```
+
+### Week 30 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_30, Local_Moran_I_pvalue_week_30)
+```
+
+### Week 31 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_31, Local_Moran_I_pvalue_week_31)
+```
+
+### Week 32 comparison
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Local_Moran_I_week_32, Local_Moran_I_pvalue_week_32)
+```
+
+## {-}
+
+A positive value for local moran statistic indicates that a region has neighbors with similarly high or low values which indicates a cluster. <br />
+A negative value for local moran statistic indicates that a region has neighbors with dissimilar values which indicates an outlier. <br />
+For both cases, the P value has to be lower than alpha for the region to be considered statistically signifcant.<br />
+
+At confidence level of 99.9%, the alpha value is 0.001. As seen from the weekly comparisons above between local moran I statistics and its p-values, we can see a general trend, in which the darker regions of local moran I statistic map with positive values are within the areas where p-values are below 0.001 meaning that these ares are statistically significant and cluster is present.
+
+## Plotting sample Moran scatterplot for week 13 and 32 to check if it matches the Moran I scores.
+
+**Moran I scores for week 13 and 32**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+head(localMI13)
+
+head(localMI32)
+```
+
+**Plotting Moran scatterplot with standardized variable for week 13 and 32**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+covid$`Z.rate13` <- scale(covid$`rate13`) %>% as.vector
+
+nci13 <- moran.plot(covid$`Z.rate13`, rswm_q, labels=as.character(covid$NOMGEO), xlab="z-rate13", ylab="Spatially Lag z-rate13")
+
+covid$`Z.rate32` <- scale(covid$`rate32`) %>% as.vector
+
+nci32 <- moran.plot(covid$`Z.rate32`, rswm_q, labels=as.character(covid$NOMGEO), xlab="z-rate32", ylab="Spatially Lag z-rate32")
+```
+
+From the sample scatterplot above, we can see that they tally with the moran I scores computed, but we are unable to pinpoint significant areas, therefore we will look at the thematic mapping method : LISA analysis.
+
+## Preparing LISA plot for week 13 to 32
+
+**LISA plots tells us about the auto correlation between regions**<br />
+High-High: Positive Auto correlation cluster
+High-Low: Negative Auto correlation outlier
+Low-High: Negative Auto correlation outlier
+Low-Low: Positive Auto correlation cluster
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE,}
+quadrant13 <- vector(mode="numeric",length=nrow(localMI13))
+DV13 <- covid$`rate13` - mean(covid$`rate13`)
+C_mI13 <- localMI13[,1] - mean(localMI13[,1])  
+signif <- 0.05      
+quadrant13[DV13 >0 & C_mI13>0] <- 4      
+quadrant13[DV13 <0 & C_mI13<0] <- 1      
+quadrant13[DV13 <0 & C_mI13>0] <- 2
+quadrant13[DV13 >0 & C_mI13<0] <- 3
+quadrant13[localMI13[,5]>signif] <- 0
+
+quadrant14 <- vector(mode="numeric",length=nrow(localMI14))
+DV14 <- covid$`rate14` - mean(covid$`rate14`)
+C_mI14 <- localMI14[,1] - mean(localMI14[,1])  
+signif <- 0.05      
+quadrant14[DV14 >0 & C_mI14>0] <- 4      
+quadrant14[DV14 <0 & C_mI14<0] <- 1      
+quadrant14[DV14 <0 & C_mI14>0] <- 2
+quadrant14[DV14 >0 & C_mI14<0] <- 3
+quadrant14[localMI14[,5]>signif] <- 0
+
+quadrant15 <- vector(mode="numeric",length=nrow(localMI15))
+DV15 <- covid$`rate15` - mean(covid$`rate15`)
+C_mI15 <- localMI15[,1] - mean(localMI15[,1])  
+signif <- 0.05      
+quadrant15[DV15 >0 & C_mI15>0] <- 4      
+quadrant15[DV15 <0 & C_mI15<0] <- 1      
+quadrant15[DV15 <0 & C_mI15>0] <- 2
+quadrant15[DV15 >0 & C_mI15<0] <- 3
+quadrant15[localMI15[,5]>signif] <- 0
+
+quadrant16 <- vector(mode="numeric",length=nrow(localMI16))
+DV16 <- covid$`rate16` - mean(covid$`rate16`)
+C_mI16 <- localMI16[,1] - mean(localMI16[,1])  
+signif <- 0.05      
+quadrant16[DV16 >0 & C_mI16>0] <- 4      
+quadrant16[DV16 <0 & C_mI16<0] <- 1      
+quadrant16[DV16 <0 & C_mI16>0] <- 2
+quadrant16[DV16 >0 & C_mI16<0] <- 3
+quadrant16[localMI16[,5]>signif] <- 0
+
+quadrant17 <- vector(mode="numeric",length=nrow(localMI17))
+DV17 <- covid$`rate17` - mean(covid$`rate17`)
+C_mI17 <- localMI17[,1] - mean(localMI17[,1])  
+signif <- 0.05      
+quadrant17[DV17 >0 & C_mI17>0] <- 4      
+quadrant17[DV17 <0 & C_mI17<0] <- 1      
+quadrant17[DV17 <0 & C_mI17>0] <- 2
+quadrant17[DV17 >0 & C_mI17<0] <- 3
+quadrant17[localMI17[,5]>signif] <- 0
+
+quadrant18 <- vector(mode="numeric",length=nrow(localMI18))
+DV18 <- covid$`rate18` - mean(covid$`rate18`)
+C_mI18 <- localMI18[,1] - mean(localMI18[,1])  
+signif <- 0.05      
+quadrant18[DV18 >0 & C_mI18>0] <- 4      
+quadrant18[DV18 <0 & C_mI18<0] <- 1      
+quadrant18[DV18 <0 & C_mI18>0] <- 2
+quadrant18[DV18 >0 & C_mI18<0] <- 3
+quadrant18[localMI18[,5]>signif] <- 0
+
+quadrant19 <- vector(mode="numeric",length=nrow(localMI19))
+DV19 <- covid$`rate19` - mean(covid$`rate19`)
+C_mI19 <- localMI19[,1] - mean(localMI19[,1])  
+signif <- 0.05      
+quadrant19[DV19 >0 & C_mI19>0] <- 4      
+quadrant19[DV19 <0 & C_mI19<0] <- 1      
+quadrant19[DV19 <0 & C_mI19>0] <- 2
+quadrant19[DV19 >0 & C_mI19<0] <- 3
+quadrant19[localMI19[,5]>signif] <- 0
+
+quadrant20 <- vector(mode="numeric",length=nrow(localMI20))
+DV20 <- covid$`rate20` - mean(covid$`rate20`)
+C_mI20 <- localMI20[,1] - mean(localMI20[,1])  
+signif <- 0.05      
+quadrant20[DV20 >0 & C_mI20>0] <- 4      
+quadrant20[DV20 <0 & C_mI20<0] <- 1      
+quadrant20[DV20 <0 & C_mI20>0] <- 2
+quadrant20[DV20 >0 & C_mI20<0] <- 3
+quadrant20[localMI20[,5]>signif] <- 0
+
+quadrant21 <- vector(mode="numeric",length=nrow(localMI21))
+DV21 <- covid$`rate21` - mean(covid$`rate21`)
+C_mI21 <- localMI21[,1] - mean(localMI21[,1])  
+signif <- 0.05      
+quadrant21[DV21 >0 & C_mI21>0] <- 4      
+quadrant21[DV21 <0 & C_mI21<0] <- 1      
+quadrant21[DV21 <0 & C_mI21>0] <- 2
+quadrant21[DV21 >0 & C_mI21<0] <- 3
+quadrant21[localMI21[,5]>signif] <- 0
+
+quadrant22 <- vector(mode="numeric",length=nrow(localMI22))
+DV22 <- covid$`rate22` - mean(covid$`rate22`)
+C_mI22 <- localMI22[,1] - mean(localMI22[,1])  
+signif <- 0.05      
+quadrant22[DV22 >0 & C_mI22>0] <- 4      
+quadrant22[DV22 <0 & C_mI22<0] <- 1      
+quadrant22[DV22 <0 & C_mI22>0] <- 2
+quadrant22[DV22 >0 & C_mI22<0] <- 3
+quadrant22[localMI22[,5]>signif] <- 0
+
+quadrant23 <- vector(mode="numeric",length=nrow(localMI23))
+DV23 <- covid$`rate23` - mean(covid$`rate23`)
+C_mI23 <- localMI23[,1] - mean(localMI23[,1])  
+signif <- 0.05      
+quadrant23[DV23 >0 & C_mI23>0] <- 4      
+quadrant23[DV23 <0 & C_mI23<0] <- 1      
+quadrant23[DV23 <0 & C_mI23>0] <- 2
+quadrant23[DV23 >0 & C_mI23<0] <- 3
+quadrant23[localMI23[,5]>signif] <- 0
+
+quadrant24 <- vector(mode="numeric",length=nrow(localMI24))
+DV24 <- covid$`rate24` - mean(covid$`rate24`)
+C_mI24 <- localMI24[,1] - mean(localMI24[,1])  
+signif <- 0.05      
+quadrant24[DV24 >0 & C_mI24>0] <- 4      
+quadrant24[DV24 <0 & C_mI24<0] <- 1      
+quadrant24[DV24 <0 & C_mI24>0] <- 2
+quadrant24[DV24 >0 & C_mI24<0] <- 3
+quadrant24[localMI24[,5]>signif] <- 0
+
+quadrant25 <- vector(mode="numeric",length=nrow(localMI25))
+DV25 <- covid$`rate25` - mean(covid$`rate25`)
+C_mI25 <- localMI25[,1] - mean(localMI25[,1])  
+signif <- 0.05      
+quadrant25[DV25 >0 & C_mI25>0] <- 4      
+quadrant25[DV25 <0 & C_mI25<0] <- 1      
+quadrant25[DV25 <0 & C_mI25>0] <- 2
+quadrant25[DV25 >0 & C_mI25<0] <- 3
+quadrant25[localMI25[,5]>signif] <- 0
+
+quadrant26 <- vector(mode="numeric",length=nrow(localMI26))
+DV26 <- covid$`rate26` - mean(covid$`rate26`)
+C_mI26 <- localMI26[,1] - mean(localMI26[,1])  
+signif <- 0.05      
+quadrant26[DV26 >0 & C_mI26>0] <- 4      
+quadrant26[DV26 <0 & C_mI26<0] <- 1      
+quadrant26[DV26 <0 & C_mI26>0] <- 2
+quadrant26[DV26 >0 & C_mI26<0] <- 3
+quadrant26[localMI26[,5]>signif] <- 0
+
+quadrant27 <- vector(mode="numeric",length=nrow(localMI27))
+DV27 <- covid$`rate27` - mean(covid$`rate27`)
+C_mI27 <- localMI27[,1] - mean(localMI27[,1])  
+signif <- 0.05      
+quadrant27[DV27 >0 & C_mI27>0] <- 4      
+quadrant27[DV27 <0 & C_mI27<0] <- 1      
+quadrant27[DV27 <0 & C_mI27>0] <- 2
+quadrant27[DV27 >0 & C_mI27<0] <- 3
+quadrant27[localMI27[,5]>signif] <- 0
+
+quadrant28 <- vector(mode="numeric",length=nrow(localMI28))
+DV28 <- covid$`rate28` - mean(covid$`rate28`)
+C_mI28 <- localMI28[,1] - mean(localMI28[,1])  
+signif <- 0.05      
+quadrant28[DV28 >0 & C_mI28>0] <- 4      
+quadrant28[DV28 <0 & C_mI28<0] <- 1      
+quadrant28[DV28 <0 & C_mI28>0] <- 2
+quadrant28[DV28 >0 & C_mI28<0] <- 3
+quadrant28[localMI28[,5]>signif] <- 0
+
+quadrant29 <- vector(mode="numeric",length=nrow(localMI29))
+DV29 <- covid$`rate29` - mean(covid$`rate29`)
+C_mI29 <- localMI29[,1] - mean(localMI29[,1])  
+signif <- 0.05      
+quadrant29[DV29 >0 & C_mI29>0] <- 4      
+quadrant29[DV29 <0 & C_mI29<0] <- 1      
+quadrant29[DV29 <0 & C_mI29>0] <- 2
+quadrant29[DV29 >0 & C_mI29<0] <- 3
+quadrant29[localMI29[,5]>signif] <- 0
+
+quadrant30 <- vector(mode="numeric",length=nrow(localMI30))
+DV30 <- covid$`rate30` - mean(covid$`rate30`)
+C_mI30 <- localMI30[,1] - mean(localMI30[,1])  
+signif <- 0.05      
+quadrant30[DV30 >0 & C_mI30>0] <- 4      
+quadrant30[DV30 <0 & C_mI30<0] <- 1      
+quadrant30[DV30 <0 & C_mI30>0] <- 2
+quadrant30[DV30 >0 & C_mI30<0] <- 3
+quadrant30[localMI30[,5]>signif] <- 0
+
+quadrant31 <- vector(mode="numeric",length=nrow(localMI31))
+DV31 <- covid$`rate31` - mean(covid$`rate31`)
+C_mI31 <- localMI31[,1] - mean(localMI31[,1])  
+signif <- 0.05      
+quadrant31[DV31 >0 & C_mI31>0] <- 4      
+quadrant31[DV31 <0 & C_mI31<0] <- 1      
+quadrant31[DV31 <0 & C_mI31>0] <- 2
+quadrant31[DV31 >0 & C_mI31<0] <- 3
+quadrant31[localMI31[,5]>signif] <- 0
+
+quadrant32 <- vector(mode="numeric",length=nrow(localMI32))
+DV32 <- covid$`rate32` - mean(covid$`rate32`)
+C_mI32 <- localMI32[,1] - mean(localMI32[,1])  
+signif <- 0.05      
+quadrant32[DV32 >0 & C_mI32>0] <- 4      
+quadrant32[DV32 <0 & C_mI32<0] <- 1      
+quadrant32[DV32 <0 & C_mI32>0] <- 2
+quadrant32[DV32 >0 & C_mI32<0] <- 3
+quadrant32[localMI32[,5]>signif] <- 0
+```
+
+**Building LISA maps**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+covid.localMI13$quadrant13 <- quadrant13
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA13 <- tm_shape(covid.localMI13) +
+  tm_fill(col = "quadrant13", style = "cat", palette = colors[c(sort(unique(quadrant13)))+1], labels = clusters[c(sort(unique(quadrant13)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI14$quadrant14 <- quadrant14
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA14 <- tm_shape(covid.localMI14) +
+  tm_fill(col = "quadrant14", style = "cat", palette = colors[c(sort(unique(quadrant14)))+1], labels = clusters[c(sort(unique(quadrant14)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI15$quadrant15 <- quadrant15
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA15 <- tm_shape(covid.localMI15) +
+  tm_fill(col = "quadrant15", style = "cat", palette = colors[c(sort(unique(quadrant15)))+1], labels = clusters[c(sort(unique(quadrant15)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI16$quadrant16 <- quadrant16
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA16 <- tm_shape(covid.localMI16) +
+  tm_fill(col = "quadrant16", style = "cat", palette = colors[c(sort(unique(quadrant16)))+1], labels = clusters[c(sort(unique(quadrant16)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI17$quadrant17 <- quadrant17
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA17 <- tm_shape(covid.localMI17) +
+  tm_fill(col = "quadrant17", style = "cat", palette = colors[c(sort(unique(quadrant17)))+1], labels = clusters[c(sort(unique(quadrant17)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI18$quadrant18 <- quadrant18
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA18 <- tm_shape(covid.localMI18) +
+  tm_fill(col = "quadrant18", style = "cat", palette = colors[c(sort(unique(quadrant18)))+1], labels = clusters[c(sort(unique(quadrant18)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI19$quadrant19 <- quadrant19
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA19 <- tm_shape(covid.localMI19) +
+  tm_fill(col = "quadrant19", style = "cat", palette = colors[c(sort(unique(quadrant19)))+1], labels = clusters[c(sort(unique(quadrant19)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI20$quadrant20 <- quadrant20
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA20 <- tm_shape(covid.localMI20) +
+  tm_fill(col = "quadrant20", style = "cat", palette = colors[c(sort(unique(quadrant20)))+1], labels = clusters[c(sort(unique(quadrant20)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI21$quadrant21 <- quadrant21
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA21 <- tm_shape(covid.localMI21) +
+  tm_fill(col = "quadrant21", style = "cat", palette = colors[c(sort(unique(quadrant21)))+1], labels = clusters[c(sort(unique(quadrant21)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI22$quadrant22 <- quadrant22
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA22 <- tm_shape(covid.localMI22) +
+  tm_fill(col = "quadrant22", style = "cat", palette = colors[c(sort(unique(quadrant22)))+1], labels = clusters[c(sort(unique(quadrant22)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI23$quadrant23 <- quadrant23
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA23 <- tm_shape(covid.localMI23) +
+  tm_fill(col = "quadrant23", style = "cat", palette = colors[c(sort(unique(quadrant23)))+1], labels = clusters[c(sort(unique(quadrant23)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI24$quadrant24 <- quadrant24
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA24 <- tm_shape(covid.localMI24) +
+  tm_fill(col = "quadrant24", style = "cat", palette = colors[c(sort(unique(quadrant24)))+1], labels = clusters[c(sort(unique(quadrant24)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI25$quadrant25 <- quadrant25
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA25 <- tm_shape(covid.localMI25) +
+  tm_fill(col = "quadrant25", style = "cat", palette = colors[c(sort(unique(quadrant25)))+1], labels = clusters[c(sort(unique(quadrant25)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI26$quadrant26 <- quadrant26
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA26 <- tm_shape(covid.localMI26) +
+  tm_fill(col = "quadrant26", style = "cat", palette = colors[c(sort(unique(quadrant26)))+1], labels = clusters[c(sort(unique(quadrant26)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI27$quadrant27 <- quadrant27
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA27 <- tm_shape(covid.localMI27) +
+  tm_fill(col = "quadrant27", style = "cat", palette = colors[c(sort(unique(quadrant27)))+1], labels = clusters[c(sort(unique(quadrant27)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI28$quadrant28 <- quadrant28
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA28 <- tm_shape(covid.localMI28) +
+  tm_fill(col = "quadrant28", style = "cat", palette = colors[c(sort(unique(quadrant28)))+1], labels = clusters[c(sort(unique(quadrant28)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI29$quadrant29 <- quadrant29
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA29 <- tm_shape(covid.localMI29) +
+  tm_fill(col = "quadrant29", style = "cat", palette = colors[c(sort(unique(quadrant29)))+1], labels = clusters[c(sort(unique(quadrant29)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI30$quadrant30 <- quadrant30
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA30 <- tm_shape(covid.localMI30) +
+  tm_fill(col = "quadrant30", style = "cat", palette = colors[c(sort(unique(quadrant30)))+1], labels = clusters[c(sort(unique(quadrant30)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI31$quadrant31 <- quadrant31
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA31 <- tm_shape(covid.localMI31) +
+  tm_fill(col = "quadrant31", style = "cat", palette = colors[c(sort(unique(quadrant31)))+1], labels = clusters[c(sort(unique(quadrant31)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+
+covid.localMI32$quadrant32 <- quadrant32
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+LISA32 <- tm_shape(covid.localMI32) +
+  tm_fill(col = "quadrant32", style = "cat", palette = colors[c(sort(unique(quadrant32)))+1], labels = clusters[c(sort(unique(quadrant32)))+1], popup.vars = c("Postal.Code")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+```
+
+### Plotting LISA for month of April, weeks 13 to 16
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(LISA13, LISA14, LISA15, LISA16)
+```
+
+In April, we can observe High-High clusters located in the same area slightly east of the center of Central Mexico and as the weeks progress, these clusters started rapidly spreading towards the South. This rapid spread could be due to late enforcement of transportation restrictions, as mentioned in the wiki, the government only enforced transport restrictions from covid infected cities on April 16 (week 15).
+
+### Plotting LISA for month of May, weeks 17 to 20
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(LISA17, LISA18, LISA19, LISA20)
+```
+
+In May, the main High-High cluster remains. However, from week 18 to 20, we can observe a new cluster emerging in the south western regions of Central Mexico, which progressively mutated over weeks 18 to 20 from a Low-High cluster to a Low-Low cluster and lastly stabilizing as a Low-High cluster.
+
+### Plotting LISA for month of June, weeks 21 to 24
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(LISA21, LISA22, LISA23, LISA24)
+```
+
+In June, the main High-High cluster remains. However, within these 4 weeks, some states located on the northern side of the High-High Cluster have progressively reduced and completely disappeared by week 24. Similar observations can be said about the cluster on the south western side of Central Mexico, where a state has completely disappeared as a cluster although a state further east of this cluster eventually becomes a Low-High cluster by the end of week 24.
+
+### Plotting LISA for month of July, weeks 25 to 28
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(LISA25, LISA26, LISA27, LISA28)
+```
+
+In July, the main High-High cluster remains unchanged, the Low-High cluster is reduced by 2 states at the end of week 28. However, surprisingly a new High-High cluster has formed in the middle of Central Mexico starting from week 26 and has expanded slightly by the end of wek 28. This new cluster could be data that was not included previously due to inconsistencies of covid case reporting by certain states, this is reflected in the wiki that on July 11 (Week 26), Undersecretary Hugo López-Gatell pointed out delayed reporting by several states.
+
+### Plotting LISA for month of August, week 29 to 31
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(LISA29, LISA30, LISA31, LISA32)
+```
+
+In August, observations are relatively interesting, this is because in these last 4 weeks, the Low-High cluster in the south western region and the High-High cluster in the middle have completely disappeared by the end of week 32 and only the main High-High cluster remains. 
+
+In conclusion, these changes seen in the LISA analysis over the months of April to August could be a reflection of the effectiveness of covid-19 measures applied in different states.
+
+# Part 4
+## local Getis-Ord Gi* analysis
+
+**Due to the stark differences between distance of states, it is difficult to set specific ranges for distance in a fixed distance proximity matrix. Therefore, for this analysis, we will use the adaptive distance proximity matrix.**
+
+**Creation of adaptive distance proximity matrix**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
+coords <- coordinates(covid)
+
+#as coords are not in decimal degrees, longlat = FALSE
+knb <- knn2nb(knearneigh(coords, k=6, longlat = FALSE), row.names=row.names(covid$NOMGEO))
+knb_lw <- nb2listw(knb, style = 'B')
+summary(knb_lw)
+```
+
+**Display of states and their neighbours**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+plot(covid, border="lightgrey")
+plot(knb, coordinates(covid), pch = 19, cex = 0.6, add = TRUE, col = "red")
+```
+
+**Gi statistics using adaptive distance for week 13 to 32**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+fips <- order(covid$NOMGEO)
+gi.adaptive13 <- localG(covid$`rate13`, knb_lw)
+covid.gi13 <- cbind(covid, as.matrix(gi.adaptive13))
+names(covid.gi13)[28] <- "gstat_adaptive13"
+
+gi.adaptive14 <- localG(covid$`rate14`, knb_lw)
+covid.gi14 <- cbind(covid, as.matrix(gi.adaptive14))
+names(covid.gi14)[28] <- "gstat_adaptive14"
+
+gi.adaptive15 <- localG(covid$`rate15`, knb_lw)
+covid.gi15 <- cbind(covid, as.matrix(gi.adaptive15))
+names(covid.gi15)[28] <- "gstat_adaptive15"
+
+gi.adaptive16 <- localG(covid$`rate16`, knb_lw)
+covid.gi16 <- cbind(covid, as.matrix(gi.adaptive16))
+names(covid.gi16)[28] <- "gstat_adaptive16"
+
+gi.adaptive17 <- localG(covid$`rate17`, knb_lw)
+covid.gi17 <- cbind(covid, as.matrix(gi.adaptive17))
+names(covid.gi17)[28] <- "gstat_adaptive17"
+
+gi.adaptive18 <- localG(covid$`rate18`, knb_lw)
+covid.gi18 <- cbind(covid, as.matrix(gi.adaptive18))
+names(covid.gi18)[28] <- "gstat_adaptive18"
+
+gi.adaptive19 <- localG(covid$`rate19`, knb_lw)
+covid.gi19 <- cbind(covid, as.matrix(gi.adaptive19))
+names(covid.gi19)[28] <- "gstat_adaptive19"
+
+gi.adaptive20 <- localG(covid$`rate20`, knb_lw)
+covid.gi20 <- cbind(covid, as.matrix(gi.adaptive20))
+names(covid.gi20)[28] <- "gstat_adaptive20"
+
+gi.adaptive21 <- localG(covid$`rate21`, knb_lw)
+covid.gi21 <- cbind(covid, as.matrix(gi.adaptive21))
+names(covid.gi21)[28] <- "gstat_adaptive21"
+
+gi.adaptive22 <- localG(covid$`rate22`, knb_lw)
+covid.gi22 <- cbind(covid, as.matrix(gi.adaptive22))
+names(covid.gi22)[28] <- "gstat_adaptive22"
+
+gi.adaptive23 <- localG(covid$`rate23`, knb_lw)
+covid.gi23 <- cbind(covid, as.matrix(gi.adaptive23))
+names(covid.gi23)[28] <- "gstat_adaptive23"
+
+gi.adaptive24 <- localG(covid$`rate24`, knb_lw)
+covid.gi24 <- cbind(covid, as.matrix(gi.adaptive24))
+names(covid.gi24)[28] <- "gstat_adaptive24"
+
+gi.adaptive25 <- localG(covid$`rate25`, knb_lw)
+covid.gi25 <- cbind(covid, as.matrix(gi.adaptive25))
+names(covid.gi25)[28] <- "gstat_adaptive25"
+
+gi.adaptive26 <- localG(covid$`rate26`, knb_lw)
+covid.gi26 <- cbind(covid, as.matrix(gi.adaptive26))
+names(covid.gi26)[28] <- "gstat_adaptive26"
+
+gi.adaptive27 <- localG(covid$`rate27`, knb_lw)
+covid.gi27 <- cbind(covid, as.matrix(gi.adaptive27))
+names(covid.gi27)[28] <- "gstat_adaptive27"
+
+gi.adaptive28 <- localG(covid$`rate28`, knb_lw)
+covid.gi28 <- cbind(covid, as.matrix(gi.adaptive28))
+names(covid.gi28)[28] <- "gstat_adaptive28"
+
+gi.adaptive29 <- localG(covid$`rate29`, knb_lw)
+covid.gi29 <- cbind(covid, as.matrix(gi.adaptive29))
+names(covid.gi29)[28] <- "gstat_adaptive29"
+
+gi.adaptive30 <- localG(covid$`rate30`, knb_lw)
+covid.gi30 <- cbind(covid, as.matrix(gi.adaptive30))
+names(covid.gi30)[28] <- "gstat_adaptive30"
+
+gi.adaptive31 <- localG(covid$`rate31`, knb_lw)
+covid.gi31 <- cbind(covid, as.matrix(gi.adaptive31))
+names(covid.gi31)[28] <- "gstat_adaptive31"
+
+gi.adaptive32 <- localG(covid$`rate32`, knb_lw)
+covid.gi32 <- cbind(covid, as.matrix(gi.adaptive32))
+names(covid.gi32)[28] <- "gstat_adaptive32"
+```
+
+Mapping Gi values with adaptive distance weights
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+Gi13 <- tm_shape(covid.gi13) +
+  tm_fill(col = "gstat_adaptive13",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 13") +
+  tm_borders(alpha = 0.5)
+
+Gi14 <- tm_shape(covid.gi14) +
+  tm_fill(col = "gstat_adaptive14",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 14") +
+  tm_borders(alpha = 0.5)
+
+Gi15 <- tm_shape(covid.gi15) +
+  tm_fill(col = "gstat_adaptive15",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 15") +
+  tm_borders(alpha = 0.5)
+
+Gi16 <- tm_shape(covid.gi16) +
+  tm_fill(col = "gstat_adaptive16",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 16") +
+  tm_borders(alpha = 0.5)
+
+Gi17 <- tm_shape(covid.gi17) +
+  tm_fill(col = "gstat_adaptive17",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 17") +
+  tm_borders(alpha = 0.5)
+
+Gi18 <- tm_shape(covid.gi18) +
+  tm_fill(col = "gstat_adaptive18",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 18") +
+  tm_borders(alpha = 0.5)
+
+Gi19 <- tm_shape(covid.gi19) +
+  tm_fill(col = "gstat_adaptive19",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 19") +
+  tm_borders(alpha = 0.5)
+
+Gi20 <- tm_shape(covid.gi20) +
+  tm_fill(col = "gstat_adaptive20",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 20") +
+  tm_borders(alpha = 0.5)
+
+Gi21 <- tm_shape(covid.gi21) +
+  tm_fill(col = "gstat_adaptive21",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 21") +
+  tm_borders(alpha = 0.5)
+
+Gi22 <- tm_shape(covid.gi22) +
+  tm_fill(col = "gstat_adaptive22",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 22") +
+  tm_borders(alpha = 0.5)
+
+Gi23 <- tm_shape(covid.gi23) +
+  tm_fill(col = "gstat_adaptive23",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 23") +
+  tm_borders(alpha = 0.5)
+
+Gi24 <- tm_shape(covid.gi24) +
+  tm_fill(col = "gstat_adaptive24",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 24") +
+  tm_borders(alpha = 0.5)
+
+Gi25 <- tm_shape(covid.gi25) +
+  tm_fill(col = "gstat_adaptive25",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 25") +
+  tm_borders(alpha = 0.5)
+
+Gi26 <- tm_shape(covid.gi26) +
+  tm_fill(col = "gstat_adaptive26",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 26") +
+  tm_borders(alpha = 0.5)
+
+Gi27 <- tm_shape(covid.gi27) +
+  tm_fill(col = "gstat_adaptive27",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 27") +
+  tm_borders(alpha = 0.5)
+
+Gi28 <- tm_shape(covid.gi28) +
+  tm_fill(col = "gstat_adaptive28",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 28") +
+  tm_borders(alpha = 0.5)
+
+Gi29 <- tm_shape(covid.gi29) +
+  tm_fill(col = "gstat_adaptive29",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 29") +
+  tm_borders(alpha = 0.5)
+
+Gi30 <- tm_shape(covid.gi30) +
+  tm_fill(col = "gstat_adaptive30",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 30") +
+  tm_borders(alpha = 0.5)
+
+Gi31 <- tm_shape(covid.gi31) +
+  tm_fill(col = "gstat_adaptive31",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 31") +
+  tm_borders(alpha = 0.5)
+
+Gi32 <- tm_shape(covid.gi32) +
+  tm_fill(col = "gstat_adaptive32",
+          style = "jenks",
+          palette = "-RdBu",
+          title = "local Gi 32") +
+  tm_borders(alpha = 0.5)
+```
+
+**Plotting local Gi maps for month of April, weeks 13 to 16**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Gi13, Gi14, Gi15, Gi16)
+```
+
+In this hotspot analysis for the month of April, we can observe one main hotspot in the top area of Mexico City, and it has the highest recorded intensity of covid-19 rate. Progressively throughout the next 3 weeks, this hotspot has expanded to nearby states, however this expansion is more rapid towards the southern direction.
+
+**Plotting local Gi maps for month of May, weeks 17 to 20**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Gi17, Gi18, Gi19, Gi20)
+```
+
+In the month of May, the hotspot in Mexico City still remains however from week 18 onwards we can slowly observe that intensities at the edges of this cluster start to dissipate although intensities in the center of this cluster still increases.
+
+**Plotting local Gi maps for month of June, weeks 21 to 24**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Gi21, Gi22, Gi23, Gi24)
+```
+
+In the month of June, the hotspot can be observed to be almost in the same regions however as seen from the intensity values, the intensities is starting to decrease at th end of week 24.
+
+**Plotting local Gi maps for month of July, weeks 25 to 28**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Gi25, Gi26, Gi27, Gi28)
+```
+
+In the month of July, observations remain similar as before where hotspots are in the same regions but intensities are generally decreasing.
+
+**Plotting local Gi maps for month of August, weeks 29 to 32**
+```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE, fig.retina=3}
+tmap_arrange(Gi29, Gi30, Gi31, Gi32)
+```
+
+In the month of August, we can observe that hotspot remains in the same regions however, intensities seem to be steadily increasing again after week 29. This could be due to the reopening of states in Central Mexico as stated in the wiki where they have reopened schools and other facilities starting from 3rd August.
+
+# Conclusion
+
+From this assignment, we got to analyze the Covid-19 situation in Central Mexico over a span of 20 weeks. Through different analysis techniques, we were able to find out how the number of covid cases have changed over time and also observed the trend of these changes, being which municipalities are affect or more affected over time and which of them managed to recover and have lower rates. From the 20 weeks that we have observed, we can learn that Mexico City has the highest cases of Covid 19 and also the highest growing rate of covid cases. While the other states are able to better manage and control the spread of Covid 19 as seen from the analysis. Additionally, with the help of the wiki provided, we are actually able to match real world events to specific temopral changes in the analysis. For example, we could actually see from the LISA maps that initially the spread of Covid 19 to neighboring municipalities were rapid in week 13 but slowed down by week 15 which coincides with transportation lockdown that was started in the same month.
+
+In conclusion, I believe the government could use spatio-temporal analysis to help understand the covid situation better, learn how it is spreading and specifically target municipalities that are unable to contain their spread.
+
+# References
+
+Mexico on wiki (https://en.wikipedia.org/wiki/Mexico)
+
+COVID-19 pandemic in Mexico (https://en.wikipedia.org/wiki/COVID-19_pandemic_in_Mexico)
+
+Vincent Z W Mack & Tin Seong, Kam (2018) “Is There Space for Violence?: A Data-driven Approach to the Exploration of Spatial-Temporal Dimensions of Conflict”, GeoHumanities'18: Proceedings of the 2nd ACM SIGSPATIAL Workshop on Geospatial Humanities, pp. 1-10.
