@@ -19,7 +19,8 @@ for (p in packages){
 # Importing Datasets
 CSV File: Resale flat Prices (2017 onwards)
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-resale_flat = st_read("data/aspatial/HDB_resale_price.csv")
+resale_flat = st_read("data/aspatial/flat.csv")
+resale_flat = st_as_sf(resale_flat, coords = c("Longitude", "Latitude"), crs = 3414)
 ```
 
 kml Files: 
@@ -43,6 +44,9 @@ sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-
 Shapefile : 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 mrt <- shapefile("data/geospatial/MRTLRTStnPtt.shp")
+mrt <- st_as_sf(mrt, coords = c("XCOORD", "YCOORD"), crs=3414)
+mrt <- st_transform(mrt,3414)
+st_crs(mrt)
 ```
 
 
@@ -78,3 +82,21 @@ resale_flat <- resale_flat %>%
   dplyr::select(`town`, `address`, `latitude`, `longitude`, `storey_range`, `floor_area_sqm`, `remaining_lease`, `resale_price`)
 ```
 
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+#prox_count <- function(slider_value, variable) {
+  #buffer_zone <- st_buffer(resale_flat, slider_value)
+  #resale_flat <- lengths(st_intersects(buffer_zone, variable))
+#}
+buffer_zone <- st_buffer(resale_flat, dist=250, nQuadSegs = 30)
+resale_flat$count <- lengths(st_intersects(buffer_zone, mrt))
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+tm_shape(mrt)+
+  tm_bubbles(col = "red",
+           size = 1,
+           border.col = "black",
+           border.lwd = 1)
+
+
+```
