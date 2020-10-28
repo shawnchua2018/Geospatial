@@ -3,6 +3,23 @@ library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 
+packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster')
+for (p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p,character.only = T)
+}
+
+resale_flat = st_read("data/aspatial/HDB_resale_price.csv")
+#print(resale_flat)
+preschool = st_read("data/geospatial/pre-schools-location-kml.kml")
+hawkercenter = st_read("data/geospatial/hawker-centres-kml.kml")
+cc = st_read("data/geospatial/community-clubs-kml.kml")
+parks = st_read("data/geospatial/nparks-parks-kml.kml")
+supermarket = st_read("data/geospatial/supermarkets-kml.kml")
+sport_facilities = st_read("data/geospatial/sportsg-sport-facilities-kml.kml")
+sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-kml.kml")
 
 header <- dashboardHeader(title = "$patial")
 
@@ -64,7 +81,9 @@ body <- dashboardBody(
                       max = 1000,
                       value = c(50)), prettyCheckbox("hawker_check", "To be included in model?", value = FALSE, shape="curve", outline = TRUE))),tags$style(".fullwidth { width: 100% !important; }")),
         tabItem(tabName = "view", 
-                "Display selected features"), 
+                "Display selected features", 
+                DT::dataTableOutput(outputId = "popTab")
+                ), 
         tabItem(tabName = "variables"), 
         tabItem(tabName = "GWR")
     )
@@ -76,9 +95,8 @@ server <- function(input, output) {
     set.seed(122)
     histdata <- rnorm(500)
     
-    output$plot1 <- renderPlot({
-        data <- histdata[seq_len(input$slider)]
-        hist(data)
+    output$popTab <- DT::renderDataTable({
+      DT::datatable(data = resale_flat)
     })
 }
 

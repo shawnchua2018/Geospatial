@@ -1,0 +1,38 @@
+# Metadata for NParks Parks
+---
+Identifier: 'eb4ff7e0-765b-4681-bc38-25e5892ce045'
+Name: 'nparks-parks'
+Title: 'NParks Parks'
+Description: 'The polygon in this layer represents the indicative Managed Areas of
+  Parks which are currently under the purview of NParks.'
+Topics:
+  - 'Environment'
+Keywords:
+  - 'Managed Areas'
+  - 'NParks'
+  - 'Nature Reserve'
+  - 'Parks'
+Publisher:
+  Name: 'National Parks Board'
+  Admin 1:
+    Name: 'Hafiz Magnus'
+    Department: 'NATIONAL PARKS BOARD'
+    Email: 'hafiz_ishak_magnus@nparks.gov.sg'
+Sources:
+  - 'National Parks Board'
+License: 'https://data.gov.sg/open-data-licence'
+Frequency: 'Half-yearly'
+Last Updated: '2020-01-08T00:06:06.400778'
+Resources:
+  -
+    Identifier: 'a92ea763-d132-4dcc-9827-378e65577554'
+    Title: 'NParks Parks (KML)'
+    Url: 'https://geo.data.gov.sg/nparks-parks/2019/12/30/kml/nparks-parks.kml'
+    Format: 'KML'
+    Last Updated: '2019-12-29T16:00:00'
+  -
+    Identifier: 'b7318f05-544c-4eb1-9a62-1142cd70d28c'
+    Title: 'NParks Parks (GEOJSON)'
+    Url: 'https://geo.data.gov.sg/nparks-parks/2019/12/30/geojson/nparks-parks.geojson'
+    Format: 'GeoJSON'
+    Last Updated: '2019-12-29T16:00:00'
