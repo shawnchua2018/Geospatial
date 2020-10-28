@@ -1,2 +1,0 @@
-"0","resale_flat <- resale_flat %>%"
-"0","  dplyr::select(`town`, `address`, `latitude`, `longitude`, `storey_range`, `floor_area_sqm`, `remaining_lease`, `resale_price`)"
