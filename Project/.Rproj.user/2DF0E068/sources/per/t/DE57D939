@@ -1,0 +1,32 @@
+{
+    "id": "DE57D939",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1603854127990.0,
+    "source_on_save": false,
+    "relative_order": 5,
+    "properties": {
+        "expression": "hawkercenter_svy21",
+        "caption": "hawkercenter_svy21",
+        "totalObservations": "125",
+        "displayedObservations": "125",
+        "variables": "3",
+        "cacheKey": "169D8264",
+        "object": "hawkercenter_svy21",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=hawkercenter_svy21&cache_key=169D8264&max_cols=50",
+        "preview": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1603564515,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1603854127990,
+    "read_only": false,
+    "read_only_alternatives": []
+}

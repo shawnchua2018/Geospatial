@@ -7,7 +7,7 @@ output: html_document
 
 # Loading Packages 
 ```{r echo=TRUE, warning= FALSE}
-packages = c('sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse')
+packages = c('sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster')
 for (p in packages){
   if(!require(p, character.only = T)){
     install.packages(p)
@@ -19,7 +19,7 @@ for (p in packages){
 # Importing Datasets
 CSV File: Resale flat Prices (2017 onwards)
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-resale_flat = st_read("data/aspatial/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
+resale_flat = st_read("data/aspatial/HDB_resale_price.csv")
 ```
 
 kml Files: 
@@ -36,13 +36,12 @@ supermarket = st_read("data/geospatial/supermarkets-kml.kml")
 
 sport_facilities = st_read("data/geospatial/sportsg-sport-facilities-kml.kml")
 
-Sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-kml.kml")
+sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-kml.kml")
 
 ```
 
 Shapefile : 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-library(raster)
 mrt <- shapefile("data/geospatial/MRTLRTStnPtt.shp")
 ```
 
@@ -67,15 +66,15 @@ st_crs(supermarket_svy21)
 sport_facilities_svy21 <- st_transform(sport_facilities, 3414)
 st_crs(sport_facilities_svy21)
 
-mpsz2019_svy21 <- st_transform(Sf_mpsz2019, 3414)
+mpsz2019_svy21 <- st_transform(sf_mpsz2019, 3414)
 st_crs(mpsz2019_svy21)
 
 ```
 
 
-# Filter resale flat data to yr 2020 
+# Filter resale flat data to remove unwanted columns
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-resale_flat_2020 <- resale_flat %>%
-  filter()
+resale_flat <- resale_flat %>%
+  dplyr::select(`town`, `address`, `latitude`, `longitude`, `storey_range`, `floor_area_sqm`, `remaining_lease`, `resale_price`)
 ```
 

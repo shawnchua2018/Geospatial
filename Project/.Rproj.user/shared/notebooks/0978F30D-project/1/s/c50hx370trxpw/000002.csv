@@ -1,0 +1,385 @@
+"0","preschool_svy21 <- st_transform(preschool,3414)"
+"0","st_crs(preschool_svy21)"
+"1","Coordinate Reference System:"
+"1","
+"
+"1","  User input:"
+"1"," "
+"1","EPSG:3414"
+"1"," "
+"1","
+"
+"1","  wkt:
+"
+"1",""
+"1","PROJCRS[""SVY21 / Singapore TM"",
+    BASEGEOGCRS[""SVY21"",
+        DATUM[""SVY21"",
+            ELLIPSOID[""WGS 84"",6378137,298.257223563,
+                LENGTHUNIT[""metre"",1]]],
+        PRIMEM[""Greenwich"",0,
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+        ID[""EPSG"",4757]],
+    CONVERSION[""Singapore Transverse Mercator"",
+        METHOD[""Transverse Mercator"",
+            ID[""EPSG"",9807]],
+        PARAMETER[""Latitude of natural origin"",1.36666666666667,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8801]],
+        PARAMETER[""Longitude of natural origin"",103.833333333333,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8802]],
+        PARAMETER[""Scale factor at natural origin"",1,
+            SCALEUNIT[""unity"",1],
+            ID[""EPSG"",8805]],
+        PARAMETER[""False easting"",28001.642,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8806]],
+        PARAMETER[""False northing"",38744.572,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8807]]],
+    CS[Cartesian,2],
+        AXIS[""northing (N)"",north,
+            ORDER[1],
+            LENGTHUNIT[""metre"",1]],
+        AXIS[""easting (E)"",east,
+            ORDER[2],
+            LENGTHUNIT[""metre"",1]],
+    USAGE[
+        SCOPE[""unknown""],
+        AREA[""Singapore""],
+        BBOX[1.13,103.59,1.47,104.07]],
+    ID[""EPSG"",3414]]"
+"1",""
+"1","
+"
+"0","hawkercenter_svy21 <- st_transform(hawkercenter, 3414)"
+"0","st_crs(hawkercenter_svy21)"
+"1","Coordinate Reference System:"
+"1","
+"
+"1","  User input:"
+"1"," "
+"1","EPSG:3414"
+"1"," "
+"1","
+"
+"1","  wkt:
+"
+"1",""
+"1","PROJCRS[""SVY21 / Singapore TM"",
+    BASEGEOGCRS[""SVY21"",
+        DATUM[""SVY21"",
+            ELLIPSOID[""WGS 84"",6378137,298.257223563,
+                LENGTHUNIT[""metre"",1]]],
+        PRIMEM[""Greenwich"",0,
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+        ID[""EPSG"",4757]],
+    CONVERSION[""Singapore Transverse Mercator"",
+        METHOD[""Transverse Mercator"",
+            ID[""EPSG"",9807]],
+        PARAMETER[""Latitude of natural origin"",1.36666666666667,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8801]],
+        PARAMETER[""Longitude of natural origin"",103.833333333333,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8802]],
+        PARAMETER[""Scale factor at natural origin"",1,
+            SCALEUNIT[""unity"",1],
+            ID[""EPSG"",8805]],
+        PARAMETER[""False easting"",28001.642,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8806]],
+        PARAMETER[""False northing"",38744.572,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8807]]],
+    CS[Cartesian,2],
+        AXIS[""northing (N)"",north,
+            ORDER[1],
+            LENGTHUNIT[""metre"",1]],
+        AXIS[""easting (E)"",east,
+            ORDER[2],
+            LENGTHUNIT[""metre"",1]],
+    USAGE[
+        SCOPE[""unknown""],
+        AREA[""Singapore""],
+        BBOX[1.13,103.59,1.47,104.07]],
+    ID[""EPSG"",3414]]"
+"1",""
+"1","
+"
+"0","cc_svy21 <- st_transform(cc, 3414)"
+"0","st_crs(cc_svy21)"
+"1","Coordinate Reference System:"
+"1","
+"
+"1","  User input:"
+"1"," "
+"1","EPSG:3414"
+"1"," "
+"1","
+"
+"1","  wkt:
+"
+"1",""
+"1","PROJCRS[""SVY21 / Singapore TM"",
+    BASEGEOGCRS[""SVY21"",
+        DATUM[""SVY21"",
+            ELLIPSOID[""WGS 84"",6378137,298.257223563,
+                LENGTHUNIT[""metre"",1]]],
+        PRIMEM[""Greenwich"",0,
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+        ID[""EPSG"",4757]],
+    CONVERSION[""Singapore Transverse Mercator"",
+        METHOD[""Transverse Mercator"",
+            ID[""EPSG"",9807]],
+        PARAMETER[""Latitude of natural origin"",1.36666666666667,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8801]],
+        PARAMETER[""Longitude of natural origin"",103.833333333333,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8802]],
+        PARAMETER[""Scale factor at natural origin"",1,
+            SCALEUNIT[""unity"",1],
+            ID[""EPSG"",8805]],
+        PARAMETER[""False easting"",28001.642,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8806]],
+        PARAMETER[""False northing"",38744.572,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8807]]],
+    CS[Cartesian,2],
+        AXIS[""northing (N)"",north,
+            ORDER[1],
+            LENGTHUNIT[""metre"",1]],
+        AXIS[""easting (E)"",east,
+            ORDER[2],
+            LENGTHUNIT[""metre"",1]],
+    USAGE[
+        SCOPE[""unknown""],
+        AREA[""Singapore""],
+        BBOX[1.13,103.59,1.47,104.07]],
+    ID[""EPSG"",3414]]"
+"1",""
+"1","
+"
+"0","parks_svy21 <- st_transform(parks, 3414)"
+"0","st_crs(parks_svy21)"
+"1","Coordinate Reference System:"
+"1","
+"
+"1","  User input:"
+"1"," "
+"1","EPSG:3414"
+"1"," "
+"1","
+"
+"1","  wkt:
+"
+"1",""
+"1","PROJCRS[""SVY21 / Singapore TM"",
+    BASEGEOGCRS[""SVY21"",
+        DATUM[""SVY21"",
+            ELLIPSOID[""WGS 84"",6378137,298.257223563,
+                LENGTHUNIT[""metre"",1]]],
+        PRIMEM[""Greenwich"",0,
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+        ID[""EPSG"",4757]],
+    CONVERSION[""Singapore Transverse Mercator"",
+        METHOD[""Transverse Mercator"",
+            ID[""EPSG"",9807]],
+        PARAMETER[""Latitude of natural origin"",1.36666666666667,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8801]],
+        PARAMETER[""Longitude of natural origin"",103.833333333333,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8802]],
+        PARAMETER[""Scale factor at natural origin"",1,
+            SCALEUNIT[""unity"",1],
+            ID[""EPSG"",8805]],
+        PARAMETER[""False easting"",28001.642,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8806]],
+        PARAMETER[""False northing"",38744.572,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8807]]],
+    CS[Cartesian,2],
+        AXIS[""northing (N)"",north,
+            ORDER[1],
+            LENGTHUNIT[""metre"",1]],
+        AXIS[""easting (E)"",east,
+            ORDER[2],
+            LENGTHUNIT[""metre"",1]],
+    USAGE[
+        SCOPE[""unknown""],
+        AREA[""Singapore""],
+        BBOX[1.13,103.59,1.47,104.07]],
+    ID[""EPSG"",3414]]"
+"1",""
+"1","
+"
+"0","supermarket_svy21 <- st_transform(supermarket, 3414)"
+"0","st_crs(supermarket_svy21)"
+"1","Coordinate Reference System:"
+"1","
+"
+"1","  User input:"
+"1"," "
+"1","EPSG:3414"
+"1"," "
+"1","
+"
+"1","  wkt:
+"
+"1",""
+"1","PROJCRS[""SVY21 / Singapore TM"",
+    BASEGEOGCRS[""SVY21"",
+        DATUM[""SVY21"",
+            ELLIPSOID[""WGS 84"",6378137,298.257223563,
+                LENGTHUNIT[""metre"",1]]],
+        PRIMEM[""Greenwich"",0,
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+        ID[""EPSG"",4757]],
+    CONVERSION[""Singapore Transverse Mercator"",
+        METHOD[""Transverse Mercator"",
+            ID[""EPSG"",9807]],
+        PARAMETER[""Latitude of natural origin"",1.36666666666667,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8801]],
+        PARAMETER[""Longitude of natural origin"",103.833333333333,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8802]],
+        PARAMETER[""Scale factor at natural origin"",1,
+            SCALEUNIT[""unity"",1],
+            ID[""EPSG"",8805]],
+        PARAMETER[""False easting"",28001.642,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8806]],
+        PARAMETER[""False northing"",38744.572,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8807]]],
+    CS[Cartesian,2],
+        AXIS[""northing (N)"",north,
+            ORDER[1],
+            LENGTHUNIT[""metre"",1]],
+        AXIS[""easting (E)"",east,
+            ORDER[2],
+            LENGTHUNIT[""metre"",1]],
+    USAGE[
+        SCOPE[""unknown""],
+        AREA[""Singapore""],
+        BBOX[1.13,103.59,1.47,104.07]],
+    ID[""EPSG"",3414]]"
+"1",""
+"1","
+"
+"0","sport_facilities_svy21 <- st_transform(sport_facilities, 3414)"
+"0","st_crs(sport_facilities_svy21)"
+"1","Coordinate Reference System:"
+"1","
+"
+"1","  User input:"
+"1"," "
+"1","EPSG:3414"
+"1"," "
+"1","
+"
+"1","  wkt:
+"
+"1",""
+"1","PROJCRS[""SVY21 / Singapore TM"",
+    BASEGEOGCRS[""SVY21"",
+        DATUM[""SVY21"",
+            ELLIPSOID[""WGS 84"",6378137,298.257223563,
+                LENGTHUNIT[""metre"",1]]],
+        PRIMEM[""Greenwich"",0,
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+        ID[""EPSG"",4757]],
+    CONVERSION[""Singapore Transverse Mercator"",
+        METHOD[""Transverse Mercator"",
+            ID[""EPSG"",9807]],
+        PARAMETER[""Latitude of natural origin"",1.36666666666667,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8801]],
+        PARAMETER[""Longitude of natural origin"",103.833333333333,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8802]],
+        PARAMETER[""Scale factor at natural origin"",1,
+            SCALEUNIT[""unity"",1],
+            ID[""EPSG"",8805]],
+        PARAMETER[""False easting"",28001.642,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8806]],
+        PARAMETER[""False northing"",38744.572,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8807]]],
+    CS[Cartesian,2],
+        AXIS[""northing (N)"",north,
+            ORDER[1],
+            LENGTHUNIT[""metre"",1]],
+        AXIS[""easting (E)"",east,
+            ORDER[2],
+            LENGTHUNIT[""metre"",1]],
+    USAGE[
+        SCOPE[""unknown""],
+        AREA[""Singapore""],
+        BBOX[1.13,103.59,1.47,104.07]],
+    ID[""EPSG"",3414]]"
+"1",""
+"1","
+"
+"0","mpsz2019_svy21 <- st_transform(sf_mpsz2019, 3414)"
+"0","st_crs(mpsz2019_svy21)"
+"1","Coordinate Reference System:"
+"1","
+"
+"1","  User input:"
+"1"," "
+"1","EPSG:3414"
+"1"," "
+"1","
+"
+"1","  wkt:
+"
+"1",""
+"1","PROJCRS[""SVY21 / Singapore TM"",
+    BASEGEOGCRS[""SVY21"",
+        DATUM[""SVY21"",
+            ELLIPSOID[""WGS 84"",6378137,298.257223563,
+                LENGTHUNIT[""metre"",1]]],
+        PRIMEM[""Greenwich"",0,
+            ANGLEUNIT[""degree"",0.0174532925199433]],
+        ID[""EPSG"",4757]],
+    CONVERSION[""Singapore Transverse Mercator"",
+        METHOD[""Transverse Mercator"",
+            ID[""EPSG"",9807]],
+        PARAMETER[""Latitude of natural origin"",1.36666666666667,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8801]],
+        PARAMETER[""Longitude of natural origin"",103.833333333333,
+            ANGLEUNIT[""degree"",0.0174532925199433],
+            ID[""EPSG"",8802]],
+        PARAMETER[""Scale factor at natural origin"",1,
+            SCALEUNIT[""unity"",1],
+            ID[""EPSG"",8805]],
+        PARAMETER[""False easting"",28001.642,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8806]],
+        PARAMETER[""False northing"",38744.572,
+            LENGTHUNIT[""metre"",1],
+            ID[""EPSG"",8807]]],
+    CS[Cartesian,2],
+        AXIS[""northing (N)"",north,
+            ORDER[1],
+            LENGTHUNIT[""metre"",1]],
+        AXIS[""easting (E)"",east,
+            ORDER[2],
+            LENGTHUNIT[""metre"",1]],
+    USAGE[
+        SCOPE[""unknown""],
+        AREA[""Singapore""],
+        BBOX[1.13,103.59,1.47,104.07]],
+    ID[""EPSG"",3414]]"
+"1",""
+"1","
+"

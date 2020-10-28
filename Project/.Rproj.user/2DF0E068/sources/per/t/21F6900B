@@ -1,0 +1,32 @@
+{
+    "id": "21F6900B",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1603853700534.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "expression": "cc",
+        "caption": "cc",
+        "totalObservations": 119,
+        "displayedObservations": 119,
+        "variables": 3,
+        "cacheKey": "B8608E23",
+        "object": "cc",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=cc&cache_key=B8608E23&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 29836824280170608,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1603853700534,
+    "read_only": false,
+    "read_only_alternatives": []
+}

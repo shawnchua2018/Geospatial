@@ -1,0 +1,32 @@
+{
+    "id": "A0DD968E",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1603854130359.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "expression": "hawkercenter",
+        "caption": "hawkercenter",
+        "totalObservations": 125,
+        "displayedObservations": 125,
+        "variables": 3,
+        "cacheKey": "B766009C",
+        "object": "hawkercenter",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=hawkercenter&cache_key=B766009C&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1699743709592,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1603854130359,
+    "read_only": false,
+    "read_only_alternatives": []
+}
