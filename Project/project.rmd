@@ -17,16 +17,26 @@ for (p in packages){
 ```
 
 # Importing Datasets
-CSV File: Resale flat Prices (2017 onwards)
+CSV File: Resale flat Prices (2020 onwards)
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-resale_flat = st_read("data/aspatial/flat.csv")
-sf_resale_flat <- st_as_sf(resale_flat, coords = c("Latitude","Longitude"),crs= 3414)
+resale_flat = st_read("data/aspatial/Resale_flats_compiled.csv")
 
-sp_resale <- as_Spatial(sf_resale_flat) 
+resale_flat$latitude <- as.numeric(resale_flat$latitude)
+resale_flat$longitude <- as.numeric(resale_flat$longitude)
 
-coordinates(resale_flat) <- c("Latitude", "Longitude")
-proj4string(resale_flat) <- CRS("+init=epsg:4267")
-print(summary(resale_flat))
+cord.dec = SpatialPoints(cbind(resale_flat$longitude, resale_flat$latitude), proj4string=CRS("+proj=longlat"))
+
+cord.UTM <- spTransform(cord.dec, CRS("+init=epsg:3414"))
+cord.UTM
+
+new_coords <- data.frame(cord.UTM@coords)
+summary(new_coords)
+new_coords <- new_coords %>%
+  rename(X = coords.x1, Y = coords.x2)
+
+resale_flat <- cbind(resale_flat, "X" = new_coords[1], "Y" = new_coords[2])
+
+sf_resale_flat <- st_as_sf(resale_flat, coords = c("X","Y"),crs= 3414)
 ```
 
 kml Files: 
@@ -99,7 +109,7 @@ sf_resale_flat$count <- lengths(st_intersects(buffer_zone, mrt))
 ```
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-tm_shape(mrt)+
+tm_shape(sf_resale_flat)+
   tm_bubbles(col = "red",
            size = 1,
            border.col = "black",
