@@ -20,7 +20,13 @@ for (p in packages){
 CSV File: Resale flat Prices (2017 onwards)
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 resale_flat = st_read("data/aspatial/flat.csv")
-resale_flat = st_as_sf(resale_flat, coords = c("Longitude", "Latitude"), crs = 3414)
+sf_resale_flat <- st_as_sf(resale_flat, coords = c("Latitude","Longitude"),crs= 3414)
+
+sp_resale <- as_Spatial(sf_resale_flat) 
+
+coordinates(resale_flat) <- c("Latitude", "Longitude")
+proj4string(resale_flat) <- CRS("+init=epsg:4267")
+print(summary(resale_flat))
 ```
 
 kml Files: 
@@ -47,6 +53,7 @@ mrt <- shapefile("data/geospatial/MRTLRTStnPtt.shp")
 mrt <- st_as_sf(mrt, coords = c("XCOORD", "YCOORD"), crs=3414)
 mrt <- st_transform(mrt,3414)
 st_crs(mrt)
+st_is_longlat(mrt)
 ```
 
 
@@ -87,8 +94,8 @@ resale_flat <- resale_flat %>%
   #buffer_zone <- st_buffer(resale_flat, slider_value)
   #resale_flat <- lengths(st_intersects(buffer_zone, variable))
 #}
-buffer_zone <- st_buffer(resale_flat, dist=250, nQuadSegs = 30)
-resale_flat$count <- lengths(st_intersects(buffer_zone, mrt))
+buffer_zone <- st_buffer(sf_resale_flat, 250)
+sf_resale_flat$count <- lengths(st_intersects(buffer_zone, mrt))
 ```
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
