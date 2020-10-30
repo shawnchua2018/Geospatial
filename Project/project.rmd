@@ -38,6 +38,49 @@ resale_flat <- cbind(resale_flat, "X" = new_coords[1], "Y" = new_coords[2])
 
 sf_resale_flat <- st_as_sf(resale_flat, coords = c("X","Y"),crs= 3414)
 ```
+Schools CSV
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+school = st_read("data/aspatial/Schools.csv")
+
+school$latitude <- as.numeric(school$latitude)
+school$longitude <- as.numeric(school$longitude)
+
+cord.dec.sch = SpatialPoints(cbind(school$longitude, school$latitude), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.sch <- spTransform(cord.dec.sch, CRS("+init=epsg:3414"))
+cord.UTM.sch
+
+new_coords_sch <- data.frame(cord.UTM.sch@coords)
+summary(new_coords_sch)
+new_coords_sch <- new_coords_sch %>%
+  rename(X = coords.x1, Y = coords.x2)
+
+school <- cbind(school, "X" = new_coords_sch[1], "Y" = new_coords_sch[2])
+
+sf_school <- st_as_sf(school, coords = c("X","Y"),crs= 3414)
+```
+
+Shopping Malls CSV 
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+mall = st_read("data/aspatial/Shopping_Malls.csv")
+
+mall$latitude <- as.numeric(mall$latitude)
+mall$longitude <- as.numeric(mall$longitude)
+
+cord.dec.mall = SpatialPoints(cbind(mall$longitude, mall$latitude), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.mall <- spTransform(cord.dec.mall, CRS("+init=epsg:3414"))
+cord.UTM.mall
+
+new_coords_mall <- data.frame(cord.UTM.mall@coords)
+summary(new_coords_mall)
+new_coords_mall <- new_coords_mall %>%
+  rename(X = coords.x1, Y = coords.x2)
+
+mall <- cbind(mall, "X" = new_coords_mall[1], "Y" = new_coords_mall[2])
+
+sf_mall <- st_as_sf(mall, coords = c("X","Y"),crs= 3414)
+```
 
 kml Files: 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
