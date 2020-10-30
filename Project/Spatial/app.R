@@ -21,6 +21,7 @@ supermarket = st_read("data/geospatial/supermarkets-kml.kml")
 sport_facilities = st_read("data/geospatial/sportsg-sport-facilities-kml.kml")
 sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-kml.kml")
 
+
 header <- dashboardHeader(title = "$patial")
 
 sidebar <- dashboardSidebar(
@@ -35,6 +36,7 @@ sidebar <- dashboardSidebar(
                  tabName = "GWR", icon= icon("map-marked-alt"))
     )
 )
+
 
 body <- dashboardBody(
     tabItems(
@@ -52,18 +54,62 @@ body <- dashboardBody(
         
         tabItem(tabName = "settings", tabsetPanel(tabPanel("Feature Selection", 
                                                            icon = icon("check-square"),
-                                                           h3("Pick features to be included in model"),
-                                                           checkboxInput(inputId = "mrt", label = "MRT", value = FALSE ), 
+                                                           h3("Bandwidth Setting"),
+                                                           checkboxInput(inputId = "mrt", label = "MRT", value = FALSE ),
+                                                           conditionalPanel(condition = "input.mrt == true", 
+                                                             sliderInput(inputId = "mrtWidth", 
+                                                                         label = "MRT",
+                                                                         min = 250, 
+                                                                         max = 1000,
+                                                                         value = c(50))),
                                                            checkboxInput(inputId = "school", label = "Schools", value = FALSE ),
-                                                           checkboxInput(inputId = "supermarket", label = "Supermarkets", value = FALSE ), 
+                                                           conditionalPanel(condition = "input.school == true",
+                                                                            sliderInput(inputId = "schoolWidth", 
+                                                                                        label = "Schools",
+                                                                                        min = 250, 
+                                                                                        max = 1000,
+                                                                                        value = c(50))),
+                                                           checkboxInput(inputId = "supermarket", label = "Supermarkets", value = FALSE ),
+                                                           conditionalPanel(condition = "input.supermarket == true",
+                                                                            sliderInput(inputId = "supermarketWidth", 
+                                                                                        label = "Supermarkets",
+                                                                                        min = 250, 
+                                                                                        max = 1000,
+                                                                                        value = c(50))),
                                                            checkboxInput(inputId = "sport", label = "Sports Facilities", value = FALSE ),
-                                                           checkboxInput(inputId = "preschool", label = "Preschools", value = FALSE ), 
-                                                           checkboxInput(inputId = "park", label = "Parks", value = FALSE ), 
-                                                           checkboxInput(inputId = "hawker", label = "Hawkers", value = FALSE)), 
+                                                           conditionalPanel(condition = "input.sport == true",
+                                                                            sliderInput(inputId = "sportWidth", 
+                                                                                        label = "Sports",
+                                                                                        min = 250, 
+                                                                                        max = 1000,
+                                                                                        value = c(50))),
+                                                           checkboxInput(inputId = "preschool", label = "Preschools", value = FALSE ),
+                                                           conditionalPanel(condition = "input.preschool == true",
+                                                                            sliderInput(inputId = "preschoolWidth", 
+                                                                                        label = "Preschools",
+                                                                                        min = 250, 
+                                                                                        max = 1000,
+                                                                                        value = c(50))),
+                                                           checkboxInput(inputId = "park", label = "Parks", value = FALSE ),
+                                                           conditionalPanel(condition = "input.park == true",
+                                                                            sliderInput(inputId = "parkWidth", 
+                                                                                        label = "Parks",
+                                                                                        min = 250, 
+                                                                                        max = 1000,
+                                                                                        value = c(50))),
+                                                           checkboxInput(inputId = "hawker", label = "Hawkers", value = FALSE)),
+                                                            conditionalPanel(condition = "input.hawker == true",
+                                                                              sliderInput(inputId = "hawkerWidth", 
+                                                                                          label = "Hawkers",
+                                                                                          min = 250, 
+                                                                                          max = 1000,
+                                                                                          value = c(50))),
+ 
                                                   tabPanel("View Features", icon = icon("database"),
-                                                           DT::dataTableOutput(outputId = "popTab")))), 
+                                                           DT::dataTableOutput(outputId = "popTab")))),
         tabItem(tabName = "variables"), 
         tabItem(tabName = "GWR")))
+
 
 
 ui <- dashboardPage(header, sidebar, body, skin = "red")
@@ -75,6 +121,26 @@ server <- function(input, output) {
     output$popTab <- DT::renderDataTable({
       DT::datatable(data = resale_flat)
     })
+    
+    # tried to link here but couldnt work
+    sliderValues <- reactive({
+      data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Parks","Hawkers" ), 
+                 Value = as.character(c(input$mrtWidth, 
+                                        input$schoolWidth, 
+                                        input$supermarketWidth,
+                                        input$sportWidth,
+                                        input$preschoolWidth,
+                                        input$parkWidth,
+                                        input$hawkerWidth)), 
+                 stringsAsFactors = FALSE)
+    })
+      
+      output$values <- renderTable({
+        sliderValues()
+      })
+    
+
+    
 }
 
 shinyApp(ui, server)
