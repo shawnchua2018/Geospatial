@@ -100,6 +100,78 @@ sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-
 
 ```
 
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+cc <- cc %>%
+  st_cast("MULTIPOINT") %>%
+  st_cast("POINT")
+
+cc_coords <- data.frame(st_coordinates(cc))
+
+cord.dec.cc = SpatialPoints(cbind(cc_coords$X, cc_coords$Y), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.cc <- spTransform(cord.dec.cc, CRS("+init=epsg:3414"))
+new_cc <- data.frame(cord.UTM.cc)
+
+new_cc <- new_cc %>%
+  rename(X = coords.x1, Y = coords.x2)
+
+parks <- parks %>%
+  st_cast("MULTIPOINT") %>%
+  st_cast("POINT")
+
+parks_coords <- data.frame(st_coordinates(parks))
+
+cord.dec.parks = SpatialPoints(cbind(parks_coords$X, parks_coords$Y), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.parks <- spTransform(cord.dec.parks, CRS("+init=epsg:3414"))
+new_parks <- data.frame(cord.UTM.parks)
+
+new_parks <- new_parks %>%
+  rename(X = coords.x1, Y = coords.x2)
+
+preschool <- preschool %>%
+  st_cast("MULTIPOINT") %>%
+  st_cast("POINT")
+
+preschool_coords <- data.frame(st_coordinates(preschool))
+
+cord.dec.preschool = SpatialPoints(cbind(preschool_coords$X, preschool_coords$Y), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.preschool <- spTransform(cord.dec.preschool, CRS("+init=epsg:3414"))
+new_preschool <- data.frame(cord.UTM.preschool)
+
+new_preschool <- new_preschool %>%
+  rename(X = coords.x1, Y = coords.x2)
+
+sport_facilities <- sport_facilities %>%
+  st_cast("MULTIPOINT") %>%
+  st_cast("POINT")
+
+sport_facilities_coords <- data.frame(st_coordinates(sport_facilities))
+
+cord.dec.sport_facilities = SpatialPoints(cbind(sport_facilities_coords$X, sport_facilities_coords$Y), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.sport_facilities <- spTransform(cord.dec.sport_facilities, CRS("+init=epsg:3414"))
+new_sport_facilities <- data.frame(cord.UTM.sport_facilities)
+
+new_sport_facilities <- new_sport_facilities %>%
+  rename(X = coords.x1, Y = coords.x2)
+
+supermarket <- supermarket %>%
+  st_cast("MULTIPOINT") %>%
+  st_cast("POINT")
+
+supermarket_coords <- data.frame(st_coordinates(supermarket))
+
+cord.dec.supermarket = SpatialPoints(cbind(supermarket_coords$X, supermarket_coords$Y), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.supermarket <- spTransform(cord.dec.supermarket, CRS("+init=epsg:3414"))
+new_supermarket <- data.frame(cord.UTM.supermarket)
+
+new_supermarket <- new_supermarket %>%
+  rename(X = coords.x1, Y = coords.x2)
+```
+
 Shapefile : 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 mrt <- shapefile("data/geospatial/MRTLRTStnPtt.shp")
