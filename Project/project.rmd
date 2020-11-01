@@ -170,6 +170,20 @@ new_supermarket <- data.frame(cord.UTM.supermarket)
 
 new_supermarket <- new_supermarket %>%
   rename(X = coords.x1, Y = coords.x2)
+
+hawkercenter <- hawkercenter %>%
+  st_cast("MULTIPOINT") %>%
+  st_cast("POINT")
+
+hawkercenter_coords <- data.frame(st_coordinates(hawkercenter))
+
+cord.dec.hawkercenter = SpatialPoints(cbind(hawkercenter_coords$X, hawkercenter_coords$Y), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.hawkercenter <- spTransform(cord.dec.hawkercenter, CRS("+init=epsg:3414"))
+new_hawkercenter <- data.frame(cord.UTM.hawkercenter)
+
+new_hawkercenter <- new_hawkercenter %>%
+  rename(X = coords.x1, Y = coords.x2)
 ```
 
 Shapefile : 
@@ -181,6 +195,14 @@ st_crs(mrt)
 st_is_longlat(mrt)
 ```
 
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+sf_parks <- st_as_sf(new_parks, coords = c("X","Y"),crs= 3414)
+sf_hawkercenter <- st_as_sf(new_hawkercenter, coords = c("X","Y"),crs= 3414)
+sf_preschool <- st_as_sf(new_preschool, coords = c("X","Y"),crs= 3414)
+sf_sport_facilities <- st_as_sf(new_sport_facilities, coords = c("X","Y"),crs= 3414)
+sf_cc <- st_as_sf(new_cc, coords = c("X","Y"),crs= 3414)
+sf_supermarket <- st_as_sf(new_supermarket, coords = c("X","Y"),crs= 3414)
+```
 
 # Updating CRS information
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
@@ -215,12 +237,9 @@ resale_flat <- resale_flat %>%
 ```
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-#prox_count <- function(slider_value, variable) {
-  #buffer_zone <- st_buffer(resale_flat, slider_value)
-  #resale_flat <- lengths(st_intersects(buffer_zone, variable))
-#}
 buffer_zone <- st_buffer(sf_resale_flat, 250)
-sf_resale_flat$count <- lengths(st_intersects(buffer_zone, mrt))
+sf_resale_flat$sf_hawkercenter <- lengths(st_intersects(buffer_zone, sf_hawkercenter))
+
 ```
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
