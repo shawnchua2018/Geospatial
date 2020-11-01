@@ -36,6 +36,8 @@ new_coords <- new_coords %>%
 
 resale_flat <- cbind(resale_flat, "X" = new_coords[1], "Y" = new_coords[2])
 
+resale_flat = resale_flat[,!(names(resale_flat) %in% c("month","flat_model","lease_commence_date","longitude","latitude"))]
+
 sf_resale_flat <- st_as_sf(resale_flat, coords = c("X","Y"),crs= 3414)
 ```
 Schools CSV
@@ -100,6 +102,7 @@ sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-
 
 ```
 
+Changing to X,Y
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 cc <- cc %>%
   st_cast("MULTIPOINT") %>%
@@ -195,6 +198,7 @@ st_crs(mrt)
 st_is_longlat(mrt)
 ```
 
+Converting all to SF
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 sf_parks <- st_as_sf(new_parks, coords = c("X","Y"),crs= 3414)
 sf_hawkercenter <- st_as_sf(new_hawkercenter, coords = c("X","Y"),crs= 3414)
@@ -204,50 +208,9 @@ sf_cc <- st_as_sf(new_cc, coords = c("X","Y"),crs= 3414)
 sf_supermarket <- st_as_sf(new_supermarket, coords = c("X","Y"),crs= 3414)
 ```
 
-# Updating CRS information
-```{r echo=TRUE, message=FALSE, warning= FALSE}
-preschool_svy21 <- st_transform(preschool,3414)
-st_crs(preschool_svy21)
-
-hawkercenter_svy21 <- st_transform(hawkercenter, 3414)
-st_crs(hawkercenter_svy21)
-
-cc_svy21 <- st_transform(cc, 3414)
-st_crs(cc_svy21)
-
-parks_svy21 <- st_transform(parks, 3414)
-st_crs(parks_svy21)
-
-supermarket_svy21 <- st_transform(supermarket, 3414)
-st_crs(supermarket_svy21)
-
-sport_facilities_svy21 <- st_transform(sport_facilities, 3414)
-st_crs(sport_facilities_svy21)
-
-mpsz2019_svy21 <- st_transform(sf_mpsz2019, 3414)
-st_crs(mpsz2019_svy21)
-
-```
-
-
-# Filter resale flat data to remove unwanted columns
-```{r echo=TRUE, message=FALSE, warning= FALSE}
-resale_flat <- resale_flat %>%
-  dplyr::select(`town`, `address`, `latitude`, `longitude`, `storey_range`, `floor_area_sqm`, `remaining_lease`, `resale_price`)
-```
-
+Creation of buffer zone code and count
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 buffer_zone <- st_buffer(sf_resale_flat, 250)
 sf_resale_flat$sf_hawkercenter <- lengths(st_intersects(buffer_zone, sf_hawkercenter))
-
-```
-
-```{r echo=TRUE, message=FALSE, warning= FALSE}
-tm_shape(sf_resale_flat)+
-  tm_bubbles(col = "red",
-           size = 1,
-           border.col = "black",
-           border.lwd = 1)
-
 
 ```
