@@ -2,6 +2,7 @@
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
+library(DT)
 
 packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster')
 for (p in packages){
@@ -54,7 +55,16 @@ body <- dashboardBody(
         
         tabItem(tabName = "settings", tabsetPanel(tabPanel("Feature Selection", 
                                                            icon = icon("check-square"),
-                                                           h3("Bandwidth Setting"),
+                                                           h3('Select variables to view in the HDB Resale Data'), 
+                                                           div(selectInput("month", "Month", choices=c("2020-01", "2020-02", "2020-03" , "2020-04", "2020-05", "2020-06",
+                                                                                                           "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12")), 
+                                                                       style="display:inline-block"),
+                                                           div(selectInput("flat", "Flat Type", choices=c("3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE", "MULTI-GENERATION" )), 
+                                                                       style="display:inline-block"),
+                                                           br(), 
+                                                           actionButton("filter", "Filter", icon = icon("filter")), 
+                                                           p("View filtered data in the next tab"),
+                                                           h3("Radius Selection"),
                                                            checkboxInput(inputId = "mrt", label = "MRT", value = FALSE ),
                                                            conditionalPanel(condition = "input.mrt == true", 
                                                              sliderInput(inputId = "mrtWidth", 
@@ -105,8 +115,8 @@ body <- dashboardBody(
                                                                                           max = 1000,
                                                                                           value = c(0), step = 5)),
  
-                                                  tabPanel("View Features", icon = icon("database"),
-                                                           DT::dataTableOutput(outputId = "popTab")), 
+                                                  tabPanel("View Data", icon = icon("database"),
+                                                           DT::dataTableOutput(outputId = "popTab"), div(style = 'overflow-x: scroll', tableOutput("Table"))), 
                                                   tabPanel("test", tableOutput("values")))),
         tabItem(tabName = "variables"), 
         tabItem(tabName = "GWR")))
