@@ -192,7 +192,6 @@ sf_supermarket <- st_as_sf(new_supermarket, coords = c("X","Y"),crs= 3414)
 
 
 
-
 header <- dashboardHeader(title = "$patial")
 
 sidebar <- dashboardSidebar(
@@ -292,9 +291,6 @@ body <- dashboardBody(tabItems(
           actionButton("trans", "Transform", icon = icon("exchange-alt"))),
   tabItem(tabName="GWR"))) 
 
-  
-
-
 
 ui <- dashboardPage(header, sidebar, body, skin = "red")
 
@@ -303,10 +299,21 @@ server <- function(input, output) {
     histdata <- rnorm(500)
     
 
-    popdata <- reactive({
-      data
+    new_resale_flat <- reactive({
+      sf_resale_flat %>%
+        mutate(mrt_buffer = st_buffer(sf_resale_flat, input$mrtWidth))
+        #mutate(mrt_count = lengths(st_intersects(sf_resale_flat$mrt_buffer, mrt)))
     })
-  
+    
+    output$new_resale_flat <- renderTable({
+      new_resale_flat()
+    })
+    
+    output$new_resale_flat_plot <- renderPlot({
+      plot(new_resale_flat()$ds, new_resale_flat()$y)
+    })
+    
+    
       
     output$popTab <- DT::renderDataTable({
       DT::datatable(data = sf_resale_flat, 
@@ -322,7 +329,7 @@ server <- function(input, output) {
                       class = 'cell-border stripe',
                       fixedColumns = list(
                         leftColumns = 3,
-                        heightMatch = 'none', 
+                        heightMatch = 'none'
                       
                       )
                     )
@@ -331,9 +338,8 @@ server <- function(input, output) {
     
     sliderValues <- reactive({
       data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Parks","Hawkers" ), 
-                 Value = as.character(c(buffer_zone <- st_buffer(sf_resale_flat, (input$mrtWidth)),
-                                        sf_resale_flat$Num_of_MRT <- lengths(st_intersects(buffer_zone, mrt))
-                 )), 
+                 Value = as.character(c(input$mrtWdith, input$schoolWdith, input$sportWdith, input$preschoolWdith, input$parkWdith, input$hawkerWdith)
+                 ), 
                  stringsAsFactors = FALSE)
     })
       
