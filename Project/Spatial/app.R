@@ -337,8 +337,8 @@ server <- function(input, output) {
     })
     
     sliderValues <- reactive({
-      data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Parks","Hawkers" ), 
-                 Value = as.character(c(input$mrtWdith, input$schoolWdith, input$sportWdith, input$preschoolWdith, input$parkWdith, input$hawkerWdith)
+      data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Parks","Hawkers", "Shopping Malls"), 
+                 Value = as.character(c(input$mrtWidth, input$schoolWidth, input$supermarketWidth, input$sportWidth, input$preschoolWidth, input$parkWidth, input$hawkerWidth, input$mallWidth)
                  ), 
                  stringsAsFactors = FALSE)
     })
