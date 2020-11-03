@@ -279,7 +279,7 @@ body <- dashboardBody(tabItems(
                                div(selectInput("flat", "Flat Type", choices=c("1 ROOM", "2 ROOM", "3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE", "MULTI-GENERATION" )), 
                                    style="display:inline-block"),
                                br(), 
-                               actionButton("filter", "Filter", icon = icon("fil")),
+                               actionButton("filter", "Filter", icon = icon("filter")),
                                DT::dataTableOutput(outputId = "popTab"), div(style = 'overflow-x: sschoocroll', tableOutput("Table"))), 
                       tabPanel("test", tableOutput("values"))
                       )), 
@@ -313,28 +313,21 @@ server <- function(input, output) {
       plot(new_resale_flat()$ds, new_resale_flat()$y)
     })
     
+    mydata <- sf_resale_flat
+    output$mytable = DT::renderDataTable(df())
+    df <- eventReactive(input$mrt, {
+      if(input$mrtWidth != "" && !is.null(input$NewCol) && input$mrt>0){
+        if (input$type == "numeric") v1 <-numeric(NROW(mydata))
+        if (input$type == "numeric") v1 <-integers(NROW(mydata))
+        newcol <- data.frame(v1)
+        names(newcol) <- input$Distance_of_HDB_from_MRT
+        mydata <<- cbind(mydata, newcol)
+      }
+      mydata}, ignoreNULL= FALSE)
     
       
-    output$popTab <- DT::renderDataTable({
-      DT::datatable(data = sf_resale_flat, 
-                    extensions = c("FixedColumns", "FixedHeader", "Scroller"), 
-                    options = list(
-                      searching = TRUE,
-                      autoWidth = TRUE,
-                      rownames = FALSE,
-                      scroller = TRUE,
-                      scrollX = TRUE,
-                      scrollY = "500px",
-                      fixedHeader = TRUE,
-                      class = 'cell-border stripe',
-                      fixedColumns = list(
-                        leftColumns = 3,
-                        heightMatch = 'none'
-                      
-                      )
-                    )
-      )
-    })
+
+    
     
     sliderValues <- reactive({
       data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Parks","Hawkers", "Shopping Malls"), 
@@ -343,12 +336,14 @@ server <- function(input, output) {
                  stringsAsFactors = FALSE)
     })
       
+    
     output$values <- renderTable({
         sliderValues()
       })
-    
+ 
+}   
 
     
-}
+
 
 shinyApp(ui, server)
