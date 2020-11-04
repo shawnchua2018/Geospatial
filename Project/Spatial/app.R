@@ -315,8 +315,13 @@ server <- function(input, output) {
       plot(new_resale_flat()$ds, new_resale_flat()$y)
     })
     
+    
+    
+   
+    
     output$popTab <- DT::renderDataTable({
-      DT::datatable(data = sf_resale_flat, 
+      buffer_zone <- st_buffer(sf_resale_flat, input$mrtWidth)
+      DT::datatable(data = sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_zone, mrt))), 
                     extensions = c("FixedColumns", "FixedHeader", "Scroller"), 
                     options = list(
                       searching = TRUE,
