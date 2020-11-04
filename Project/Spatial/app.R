@@ -13,7 +13,6 @@ for (p in packages){
 }
 
 # Importing Datasets
-
 resale_flat = st_read("data/aspatial/Resale_flats_compiled.csv")
 
 resale_flat$latitude <- as.numeric(resale_flat$latitude)
@@ -32,9 +31,8 @@ new_coords <- new_coords %>%
 resale_flat <- cbind(resale_flat, "X" = new_coords[1], "Y" = new_coords[2])
 
 resale_flat = resale_flat[,!(names(resale_flat) %in% c("month","flat_model","lease_commence_date","longitude","latitude"))]
+
 sf_resale_flat <- st_as_sf(resale_flat, coords = c("X","Y"),crs= 3414)
-
-
 
 school = st_read("data/aspatial/Schools.csv")
 
@@ -55,6 +53,7 @@ school <- cbind(school, "X" = new_coords_sch[1], "Y" = new_coords_sch[2])
 
 sf_school <- st_as_sf(school, coords = c("X","Y"),crs= 3414)
 
+ 
 
 mall = st_read("data/aspatial/Shopping_Malls.csv")
 
@@ -74,6 +73,9 @@ new_coords_mall <- new_coords_mall %>%
 mall <- cbind(mall, "X" = new_coords_mall[1], "Y" = new_coords_mall[2])
 
 sf_mall <- st_as_sf(mall, coords = c("X","Y"),crs= 3414)
+st_transform(sf_mall, 3414)
+st_crs(sf_mall)
+
 
 preschool = st_read("data/geospatial/pre-schools-location-kml.kml")
 
@@ -89,7 +91,9 @@ sport_facilities = st_read("data/geospatial/sportsg-sport-facilities-kml.kml")
 
 sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-kml.kml")
 
-# Changing to X, Y
+
+
+
 cc <- cc %>%
   st_cast("MULTIPOINT") %>%
   st_cast("POINT")
@@ -174,7 +178,8 @@ new_hawkercenter <- data.frame(cord.UTM.hawkercenter)
 new_hawkercenter <- new_hawkercenter %>%
   rename(X = coords.x1, Y = coords.x2)
 
-# Shapefile 
+
+
 mrt <- shapefile("data/geospatial/MRTLRTStnPtt.shp")
 mrt <- st_as_sf(mrt, coords = c("XCOORD", "YCOORD"), crs=3414)
 mrt <- st_transform(mrt,3414)
@@ -182,13 +187,44 @@ st_crs(mrt)
 st_is_longlat(mrt)
 
 
-# Converting all to SF 
+# Converting all to SF and changing CRS from WGS84 to SVY21
+
 sf_parks <- st_as_sf(new_parks, coords = c("X","Y"),crs= 3414)
+st_crs(sf_parks)
+
 sf_hawkercenter <- st_as_sf(new_hawkercenter, coords = c("X","Y"),crs= 3414)
+st_transform(sf_hawkercenter, 3414)
+st_crs(sf_hawkercenter)
+
+
+
 sf_preschool <- st_as_sf(new_preschool, coords = c("X","Y"),crs= 3414)
+st_transform(sf_preschool, 3414)
+st_crs(sf_preschool)
+
+
+
 sf_sport_facilities <- st_as_sf(new_sport_facilities, coords = c("X","Y"),crs= 3414)
+st_transform(sf_sport_facilities, 3414)
+st_crs(sf_sport_facilities)
+
+
+
 sf_cc <- st_as_sf(new_cc, coords = c("X","Y"),crs= 3414)
+st_transform(sf_cc, 3414)
+st_crs(sf_cc)
+
+
+
 sf_supermarket <- st_as_sf(new_supermarket, coords = c("X","Y"),crs= 3414)
+st_transform(sf_supermarket, 3414)
+st_crs(sf_supermarket)
+
+
+#Creation of buffer zone code and count
+
+buffer_zone <- st_buffer(sf_resale_flat, 250)
+sf_resale_flat$sf_hawkercenter <- lengths(st_intersects(buffer_zone, sf_hawkercenter))
 
 
 
@@ -330,7 +366,7 @@ server <- function(input, output) {
                       scroller = TRUE,
                       scrollX = TRUE,
                       scrollY = "500px",
-                      fixedHeader = TRUE,
+                      fixedHeader = FALSE,
                       class = 'cell-border stripe',
                       fixedColumns = list(
                         leftColumns = 3,
