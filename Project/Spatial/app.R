@@ -270,7 +270,8 @@ body <- dashboardBody(tabItems(
                                                 sliderInput(inputId = 'mallWidth', label = "Shopping Malls",
                                                             min = 0, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5))),
+                                                            value = c(0), step = 5)), 
+                               actionButton("goButton", "Update Table")),
                       tabPanel("View Data", icon = icon("database"), 
                                h3("Select variables to view in the HDB Resale Data"), 
                                div(selectInput("month", "Month", choices=c("2020-01", "2020-02", "2020-03" , "2020-04", "2020-05", "2020-06",
@@ -280,7 +281,8 @@ body <- dashboardBody(tabItems(
                                    style="display:inline-block"),
                                br(), 
                                actionButton("filter", "Filter", icon = icon("filter")),
-                               DT::dataTableOutput(outputId = "popTab"), div(style = 'overflow-x: sschoocroll', tableOutput("Table"))), 
+                               DT::dataTableOutput(outputId = "popTab"), 
+                               div(style = 'overflow-x: sschoocroll', tableOutput("Table"))), 
                       tabPanel("test", tableOutput("values"))
                       )), 
   tabItem("transform",div(selectInput("var", "Select Variable to Transform", choices=c("resale_price", "remaining_lease", "floor_area_sqm")), 
@@ -313,21 +315,28 @@ server <- function(input, output) {
       plot(new_resale_flat()$ds, new_resale_flat()$y)
     })
     
-    mydata <- sf_resale_flat
-    output$mytable = DT::renderDataTable(df())
-    df <- eventReactive(input$mrt, {
-      if(input$mrtWidth != "" && !is.null(input$NewCol) && input$mrt>0){
-        if (input$type == "numeric") v1 <-numeric(NROW(mydata))
-        if (input$type == "numeric") v1 <-integers(NROW(mydata))
-        newcol <- data.frame(v1)
-        names(newcol) <- input$Distance_of_HDB_from_MRT
-        mydata <<- cbind(mydata, newcol)
-      }
-      mydata}, ignoreNULL= FALSE)
-    
-      
+    output$popTab <- DT::renderDataTable({
+      DT::datatable(data = sf_resale_flat, 
+                    extensions = c("FixedColumns", "FixedHeader", "Scroller"), 
+                    options = list(
+                      searching = TRUE,
+                      autoWidth = TRUE,
+                      rownames = FALSE,
+                      scroller = TRUE,
+                      scrollX = TRUE,
+                      scrollY = "500px",
+                      fixedHeader = TRUE,
+                      class = 'cell-border stripe',
+                      fixedColumns = list(
+                        leftColumns = 3,
+                        heightMatch = 'none'
+                        
+                      )
+                    )
+      )
+    })
 
-    
+   
     
     sliderValues <- reactive({
       data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Parks","Hawkers", "Shopping Malls"), 
