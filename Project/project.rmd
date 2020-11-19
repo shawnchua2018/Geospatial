@@ -294,3 +294,44 @@ sf_resale_flat$stn <- st_intersects(buffer_zone, mrt)
 sf_resale_flat <- sf_resale_flat %>%
   filter(mrt == 3)
 ```
+
+ output$popTab <- DT::renderDataTable({
+      buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
+      buffer_psch <- st_buffer(sf_resale_flat, input$pschoolWidth)
+      buffer_ssch <- st_buffer(sf_resale_flat, input$sschoolWidth)
+      buffer_cc <- st_buffer(sf_resale_flat, input$ccWidth)
+      buffer_supermarket <- st_buffer(sf_resale_flat, input$supermarketWidth)
+      buffer_sport <- st_buffer(sf_resale_flat, input$sportWidth)
+      buffer_preschool <- st_buffer(sf_resale_flat, input$preschoolWidth)
+    
+      buffer_hawker <- st_buffer(sf_resale_flat, input$hawkerWidth)
+      buffer_mall <- st_buffer(sf_resale_flat, input$mallWidth)
+      
+      DT::datatable(data = sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_mrt, sf_mrt)))
+                    %>% mutate(pri_school_count = lengths(st_intersects(buffer_psch, sf_pschool)))
+                    %>% mutate(sec_school_count = lengths(st_intersects(buffer_ssch, sf_sschool)))
+                    %>% mutate(community_center_count = lengths(st_intersects(buffer_cc, sf_cc)))
+                    %>% mutate(supermarket_count = lengths(st_intersects(buffer_supermarket, sf_supermarket)))
+                    %>% mutate(sport_count = lengths(st_intersects(buffer_sport, sf_sport_facilities)))
+                    %>% mutate(preschool_count = lengths(st_intersects(buffer_preschool, sf_preschool)))
+                    
+                    %>% mutate(hawker_count = lengths(st_intersects(buffer_hawker, sf_hawkercenter)))
+                    %>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall))),
+                    extensions = c("FixedColumns", "FixedHeader", "Scroller"), 
+                    options = list(
+                      searching = TRUE,
+                      autoWidth = TRUE,
+                      rownames = FALSE,
+                      scroller = TRUE,
+                      scrollX = TRUE,
+                      scrollY = "500px",
+                      fixedHeader = FALSE,
+                      class = 'cell-border stripe',
+                      fixedColumns = list(
+                        leftColumns = 3,
+                        heightMatch = 'none'
+                        
+                      )
+                    )
+      )
+    })

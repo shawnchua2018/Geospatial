@@ -34,24 +34,47 @@ resale_flat = resale_flat[,!(names(resale_flat) %in% c("month","flat_model","lea
 
 sf_resale_flat <- st_as_sf(resale_flat, coords = c("X","Y"),crs= 3414)
 
-school = st_read("data/aspatial/Schools.csv")
+#Pri school
+pschool = st_read("data/aspatial/Primary_school.csv")
 
-school$latitude <- as.numeric(school$latitude)
-school$longitude <- as.numeric(school$longitude)
+pschool$latitude <- as.numeric(pschool$latitude)
+pschool$longitude <- as.numeric(pschool$longitude)
 
-cord.dec.sch = SpatialPoints(cbind(school$longitude, school$latitude), proj4string=CRS("+proj=longlat"))
+cord.dec.psch = SpatialPoints(cbind(pschool$longitude, pschool$latitude), proj4string=CRS("+proj=longlat"))
 
-cord.UTM.sch <- spTransform(cord.dec.sch, CRS("+init=epsg:3414"))
-cord.UTM.sch
+cord.UTM.psch <- spTransform(cord.dec.psch, CRS("+init=epsg:3414"))
+cord.UTM.psch
 
-new_coords_sch <- data.frame(cord.UTM.sch@coords)
-summary(new_coords_sch)
-new_coords_sch <- new_coords_sch %>%
+new_coords_psch <- data.frame(cord.UTM.psch@coords)
+summary(new_coords_psch)
+new_coords_psch <- new_coords_psch %>%
   rename(X = coords.x1, Y = coords.x2)
 
-school <- cbind(school, "X" = new_coords_sch[1], "Y" = new_coords_sch[2])
+pschool <- cbind(pschool, "X" = new_coords_psch[1], "Y" = new_coords_psch[2])
 
-sf_school <- st_as_sf(school, coords = c("X","Y"),crs= 3414)
+sf_pschool <- st_as_sf(pschool, coords = c("X","Y"),crs= 3414)
+sf_pschool <- st_transform(sf_pschool, 3414)
+
+#sec school
+sschool = st_read("data/aspatial/Secondary_school.csv")
+
+sschool$latitude <- as.numeric(sschool$latitude)
+sschool$longitude <- as.numeric(sschool$longitude)
+
+cord.dec.ssch = SpatialPoints(cbind(sschool$longitude, sschool$latitude), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.ssch <- spTransform(cord.dec.ssch, CRS("+init=epsg:3414"))
+cord.UTM.ssch
+
+new_coords_ssch <- data.frame(cord.UTM.ssch@coords)
+summary(new_coords_ssch)
+new_coords_ssch <- new_coords_ssch %>%
+  rename(X = coords.x1, Y = coords.x2)
+
+sschool <- cbind(sschool, "X" = new_coords_ssch[1], "Y" = new_coords_ssch[2])
+
+sf_sschool <- st_as_sf(sschool, coords = c("X","Y"),crs= 3414)
+sf_sschool <- st_transform(sf_sschool, 3414)
 
  
 
@@ -73,7 +96,7 @@ new_coords_mall <- new_coords_mall %>%
 mall <- cbind(mall, "X" = new_coords_mall[1], "Y" = new_coords_mall[2])
 
 sf_mall <- st_as_sf(mall, coords = c("X","Y"),crs= 3414)
-st_transform(sf_mall, 3414)
+sf_mall <- st_transform(sf_mall, 3414)
 st_crs(sf_mall)
 
 
@@ -83,11 +106,12 @@ hawkercenter = st_read("data/geospatial/hawker-centres-kml.kml")
 
 cc = st_read("data/geospatial/community-clubs-kml.kml")
 
-parks = st_read("data/geospatial/nparks-parks-kml.kml")
+
 
 supermarket = st_read("data/geospatial/supermarkets-kml.kml")
 
 sport_facilities = st_read("data/geospatial/sportsg-sport-facilities-kml.kml")
+sport_facilities = st_centroid(sport_facilities)
 
 sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-kml.kml")
 
@@ -108,19 +132,7 @@ new_cc <- data.frame(cord.UTM.cc)
 new_cc <- new_cc %>%
   rename(X = coords.x1, Y = coords.x2)
 
-parks <- parks %>%
-  st_cast("MULTIPOINT") %>%
-  st_cast("POINT")
 
-parks_coords <- data.frame(st_coordinates(parks))
-
-cord.dec.parks = SpatialPoints(cbind(parks_coords$X, parks_coords$Y), proj4string=CRS("+proj=longlat"))
-
-cord.UTM.parks <- spTransform(cord.dec.parks, CRS("+init=epsg:3414"))
-new_parks <- data.frame(cord.UTM.parks)
-
-new_parks <- new_parks %>%
-  rename(X = coords.x1, Y = coords.x2)
 
 preschool <- preschool %>%
   st_cast("MULTIPOINT") %>%
@@ -179,52 +191,45 @@ new_hawkercenter <- new_hawkercenter %>%
   rename(X = coords.x1, Y = coords.x2)
 
 
+mrt = st_read("data/aspatial/MRT_new.csv")
+sf_mrt <- st_as_sf(mrt, coords = c("coords.x1", "coords.x2"), crs=3414)
+sf_mrt <- st_transform(sf_mrt,3414)
 
-mrt <- shapefile("data/geospatial/MRTLRTStnPtt.shp")
-mrt <- st_as_sf(mrt, coords = c("XCOORD", "YCOORD"), crs=3414)
-mrt <- st_transform(mrt,3414)
-st_crs(mrt)
-st_is_longlat(mrt)
+
 
 
 # Converting all to SF and changing CRS from WGS84 to SVY21
 
-sf_parks <- st_as_sf(new_parks, coords = c("X","Y"),crs= 3414)
-st_crs(sf_parks)
 
 sf_hawkercenter <- st_as_sf(new_hawkercenter, coords = c("X","Y"),crs= 3414)
-st_transform(sf_hawkercenter, 3414)
+sf_hawkercenter<- st_transform(sf_hawkercenter, 3414)
 st_crs(sf_hawkercenter)
 
 
 
 sf_preschool <- st_as_sf(new_preschool, coords = c("X","Y"),crs= 3414)
-st_transform(sf_preschool, 3414)
+sf_preschool <- st_transform(sf_preschool, 3414)
 st_crs(sf_preschool)
 
 
 
 sf_sport_facilities <- st_as_sf(new_sport_facilities, coords = c("X","Y"),crs= 3414)
-st_transform(sf_sport_facilities, 3414)
+sf_sport_facilities<- st_transform(sf_sport_facilities, 3414)
 st_crs(sf_sport_facilities)
 
 
 
 sf_cc <- st_as_sf(new_cc, coords = c("X","Y"),crs= 3414)
-st_transform(sf_cc, 3414)
+sf_cc <- st_transform(sf_cc, 3414)
 st_crs(sf_cc)
 
 
 
 sf_supermarket <- st_as_sf(new_supermarket, coords = c("X","Y"),crs= 3414)
-st_transform(sf_supermarket, 3414)
+sf_supermarket <- st_transform(sf_supermarket, 3414)
 st_crs(sf_supermarket)
 
 
-#Creation of buffer zone code and count
-
-buffer_zone <- st_buffer(sf_resale_flat, 250)
-sf_resale_flat$sf_hawkercenter <- lengths(st_intersects(buffer_zone, sf_hawkercenter))
 
 
 
@@ -258,52 +263,60 @@ body <- dashboardBody(tabItems(
           p("Our application allows users to select the spatial features they would like to experiment with")),
   tabItem(tabName = "settings",
           tabsetPanel(tabPanel("Feature Selection", icon = icon("check-square"), 
-                               h3("Radius Selection"), 
+                               h3("Radius Selection"),
+                               p("This page allows you to select your desired radius to view the number of features within the proximity selected"),
                                checkboxInput(inputId = "mrt", label = "MRT", value= FALSE), 
                                conditionalPanel(condition = "input.mrt == true",
-                                                sliderInput(inputId = 'mrtWidth', label = "MRT",
+                                                sliderInput(inputId = 'mrtWidth', label = "MRT (includes all MRT stations in Singapore)",
                                                             min = 0, 
                                                             max = 1000, 
                                                             value = c(0), step = 5)),
-                               checkboxInput(inputId = "school", label = "Schools", value= FALSE), 
-                               conditionalPanel(condition = "input.school == true",
-                                                sliderInput(inputId = 'schoolWidth', label = "Schools",
+                               checkboxInput(inputId = "pschool", label = "Primary Schools", value= FALSE), 
+                               conditionalPanel(condition = "input.pschool == true",
+                                                sliderInput(inputId = 'pschoolWidth', label = "Primary Schools (includes all primary schools in Singapore)",
                                                             min = 0, 
                                                             max = 1000, 
                                                             value = c(0), step = 5)),
-                               checkboxInput(inputId = "supermarket", label = "Supermarkets", value= FALSE), 
+                               checkboxInput(inputId = "sschool", label = "Secondary Schools", value= FALSE), 
+                               conditionalPanel(condition = "input.sschool == true",
+                                                sliderInput(inputId = 'sschoolWidth', label = "Secondary Schools (includes all secondary schools in Singapore)",
+                                                            min = 0, 
+                                                            max = 1000, 
+                                                            value = c(0), step = 5)),
+                               checkboxInput(inputId = "cc", label = "Community Centers", value= FALSE), 
+                               conditionalPanel(condition = "input.cc == true",
+                                                sliderInput(inputId = 'ccWidth', label = "Community Centers (includes all community centers in Singapore)",
+                                                            min = 0, 
+                                                            max = 1000, 
+                                                            value = c(0), step = 5)),
+                               checkboxInput(inputId = "supermarket", label = "Supermarkets ", value= FALSE), 
                                conditionalPanel(condition = "input.supermarket == true",
-                                                sliderInput(inputId = 'supermarketWidth', label = "Supermarkets",
+                                                sliderInput(inputId = 'supermarketWidth', label = "Supermarkets (includes all licensed supermarkets in Singapore)",
                                                             min = 0, 
                                                             max = 1000, 
                                                             value = c(0), step = 5)),
                                checkboxInput(inputId = "sport", label = "Sports Facilities", value= FALSE), 
                                conditionalPanel(condition = "input.sport == true",
-                                                sliderInput(inputId = 'sportWidth', label = "Sports",
+                                                sliderInput(inputId = 'sportWidth', label = "Sports (includes all sports facilities managed by Sport-SG)",
                                                             min = 0, 
                                                             max = 1000, 
                                                             value = c(0), step = 5)),
                                checkboxInput(inputId = "preschool", label = "Preschools", value= FALSE), 
                                conditionalPanel(condition = "input.preschool == true",
-                                                sliderInput(inputId = 'preschoolWidth', label = "Preschools",
+                                                sliderInput(inputId = 'preschoolWidth', label = "Preschools (includes both kindergarten and childcare centers)",
                                                             min = 0, 
                                                             max = 1000, 
                                                             value = c(0), step = 5)),
-                               checkboxInput(inputId = "park", label = "Parks", value= FALSE), 
-                               conditionalPanel(condition = "input.park == true",
-                                                sliderInput(inputId = 'parkWidth', label = "Parks",
-                                                            min = 0, 
-                                                            max = 1000, 
-                                                            value = c(0), step = 5)),
+                              
                                checkboxInput(inputId = "hawker", label = "Hawkers", value= FALSE), 
                                conditionalPanel(condition = "input.hawker == true",
-                                                sliderInput(inputId = 'hawkerWidth', label = "Hawkers",
+                                                sliderInput(inputId = 'hawkerWidth', label = "Hawkers (includes all hawker centers in Singapore)",
                                                             min = 0, 
                                                             max = 1000, 
                                                             value = c(0), step = 5)),
                                checkboxInput(inputId = "mall", label = "Shopping Malls", value= FALSE), 
                                conditionalPanel(condition = "input.mall == true",
-                                                sliderInput(inputId = 'mallWidth', label = "Shopping Malls",
+                                                sliderInput(inputId = 'mallWidth', label = "Shopping Malls (includes all shopping malls in Singapore)",
                                                             min = 0, 
                                                             max = 1000, 
                                                             value = c(0), step = 5)), 
@@ -328,6 +341,7 @@ body <- dashboardBody(tabItems(
           br(), 
           actionButton("trans", "Transform", icon = icon("exchange-alt"))),
   tabItem(tabName="GWR"))) 
+
 
 
 ui <- dashboardPage(header, sidebar, body, skin = "red")
@@ -356,8 +370,27 @@ server <- function(input, output) {
    
     
     output$popTab <- DT::renderDataTable({
-      buffer_zone <- st_buffer(sf_resale_flat, input$mrtWidth)
-      DT::datatable(data = sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_zone, mrt))), 
+      buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
+      buffer_psch <- st_buffer(sf_resale_flat, input$pschoolWidth)
+      buffer_ssch <- st_buffer(sf_resale_flat, input$sschoolWidth)
+      buffer_cc <- st_buffer(sf_resale_flat, input$ccWidth)
+      buffer_supermarket <- st_buffer(sf_resale_flat, input$supermarketWidth)
+      buffer_sport <- st_buffer(sf_resale_flat, input$sportWidth)
+      buffer_preschool <- st_buffer(sf_resale_flat, input$preschoolWidth)
+    
+      buffer_hawker <- st_buffer(sf_resale_flat, input$hawkerWidth)
+      buffer_mall <- st_buffer(sf_resale_flat, input$mallWidth)
+      
+      DT::datatable(data = sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_mrt, sf_mrt)))
+                    %>% mutate(pri_school_count = lengths(st_intersects(buffer_psch, sf_pschool)))
+                    %>% mutate(sec_school_count = lengths(st_intersects(buffer_ssch, sf_sschool)))
+                    %>% mutate(community_center_count = lengths(st_intersects(buffer_cc, sf_cc)))
+                    %>% mutate(supermarket_count = lengths(st_intersects(buffer_supermarket, sf_supermarket)))
+                    %>% mutate(sport_count = lengths(st_intersects(buffer_sport, sf_sport_facilities)))
+                    %>% mutate(preschool_count = lengths(st_intersects(buffer_preschool, sf_preschool)))
+                    
+                    %>% mutate(hawker_count = lengths(st_intersects(buffer_hawker, sf_hawkercenter)))
+                    %>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall))),
                     extensions = c("FixedColumns", "FixedHeader", "Scroller"), 
                     options = list(
                       searching = TRUE,
@@ -380,7 +413,7 @@ server <- function(input, output) {
    
     
     sliderValues <- reactive({
-      data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Parks","Hawkers", "Shopping Malls"), 
+      data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Hawkers", "Shopping Malls"), 
                  Value = as.character(c(input$mrtWidth, input$schoolWidth, input$supermarketWidth, input$sportWidth, input$preschoolWidth, input$parkWidth, input$hawkerWidth, input$mallWidth)
                  ), 
                  stringsAsFactors = FALSE)
