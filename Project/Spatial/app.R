@@ -4,7 +4,7 @@ library(shinydashboard)
 library(shinyWidgets)
 library(DT)
 
-packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster')
+packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster','plotly')
 for (p in packages){
   if(!require(p, character.only = T)){
     install.packages(p)
@@ -334,8 +334,27 @@ body <- dashboardBody(tabItems(
                                actionButton("filter", "Filter", icon = icon("filter")),
                                DT::dataTableOutput(outputId = "popTab"), 
                                div(style = 'overflow-x: sschoocroll', tableOutput("Table"))), 
-                      tabPanel("Analysis", icon = icon("chart-bar"), 
-                               plotOutput("boxplot")), 
+                      tabPanel("Analysis", icon = icon("chart-bar"),
+                               selectInput("choice", "Choice of Town", choices = c(sf_resale_flat$town)),
+                               conditionalPanel(condition = "input.mrt == true",
+                               plotlyOutput("mrt_box")),
+                               conditionalPanel("input.pschool == true",
+                               plotlyOutput("pschool_box")),
+                               conditionalPanel(condition = "input.sschool == true",
+                               plotlyOutput("sschool_box")),
+                               conditionalPanel(condition = "input.cc == true",
+                               plotlyOutput("cc_box")),
+                               conditionalPanel(condition = "input.supermarket == true",
+                               plotlyOutput("supermarket_box")),
+                               conditionalPanel(condition = "input.sport == true",
+                               plotlyOutput("sport_box")),
+                               conditionalPanel(condition = "input.preschool == true",
+                               plotlyOutput("preschool_box")),
+                               conditionalPanel(condition = "input.hawker == true",
+                               plotlyOutput("hawker_box")),
+                               conditionalPanel(condition = "input.mall == true",
+                               plotlyOutput("mall_box"))
+                               ))), 
   tabItem("transform",div(selectInput("var", "Select Variable to Transform", choices=c("resale_price", "remaining_lease", "floor_area_sqm")), 
                              style="display:inline-block"),
           div(selectInput("mode", "Select Transformation Mode", choices=c("Log", "Exp", "Sqrt")), 
@@ -363,15 +382,16 @@ server <- function(input, output) {
       new_resale_flat()
     })
     
+    
+  
+    
     output$new_resale_flat_plot <- renderPlot({
+    
       plot(new_resale_flat()$ds, new_resale_flat()$y)
+  
     })
     
-    
-    
-   
-    
-    output$popTab <- DT::renderDataTable({
+    output$popTab <-DT::renderDataTable({
       buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
       buffer_psch <- st_buffer(sf_resale_flat, input$pschoolWidth)
       buffer_ssch <- st_buffer(sf_resale_flat, input$sschoolWidth)
@@ -379,7 +399,7 @@ server <- function(input, output) {
       buffer_supermarket <- st_buffer(sf_resale_flat, input$supermarketWidth)
       buffer_sport <- st_buffer(sf_resale_flat, input$sportWidth)
       buffer_preschool <- st_buffer(sf_resale_flat, input$preschoolWidth)
-    
+      
       buffer_hawker <- st_buffer(sf_resale_flat, input$hawkerWidth)
       buffer_mall <- st_buffer(sf_resale_flat, input$mallWidth)
       
@@ -412,6 +432,13 @@ server <- function(input, output) {
       )
     })
 
+    
+    
+   
+  
+
+
+ 
    
     
     sliderValues <- reactive({
@@ -428,13 +455,74 @@ server <- function(input, output) {
  
   
     
-    output$boxplot <- renderPlot({
-      ggplot(sf_resale_flat, aes(mrt_count)) + geom_histogram(bins = 20, 
-                                                              color = "black",
-                                                              fill = "light pink")
+    output$mrt_box <- renderPlotly({
+      buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
+      
+      sf_resale_flat <- sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_mrt, sf_mrt)))
+      
+      ggplot(sf_resale_flat, aes(x = input$choice , y = mrt_count)) + geom_boxplot()
+    })
+    
+    output$pschool_box <- renderPlotly({
+      buffer_psch <- st_buffer(sf_resale_flat, input$pschoolWidth)
+      
+      sf_resale_flat <- sf_resale_flat %>% mutate(pri_school_count = lengths(st_intersects(buffer_psch, sf_pschool)))
+      
+      ggplot(sf_resale_flat, aes(x = input$choice , y = pri_school_count)) + geom_boxplot()
     })
 
+    output$sschool_box <- renderPlotly({
+      buffer_ssch <- st_buffer(sf_resale_flat, input$sschoolWidth)
+      
+      sf_resale_flat <- sf_resale_flat %>% mutate(sec_school_count = lengths(st_intersects(buffer_ssch, sf_sschool)))
+      
+      ggplot(sf_resale_flat, aes(x = input$choice , y = sec_school_count)) + geom_boxplot()
+    })
+  
+    output$cc_box <- renderPlotly({
+      buffer_cc <- st_buffer(sf_resale_flat, input$ccWidth)
+      
+      sf_resale_flat <- sf_resale_flat %>% mutate(community_center_count = lengths(st_intersects(buffer_cc, sf_cc)))
+      
+      ggplot(sf_resale_flat, aes(x = input$choice , y = community_center_count)) + geom_boxplot()
+    })
+  
+    output$supermarket_box <- renderPlotly({
+      buffer_supermarket <- st_buffer(sf_resale_flat, input$supermarketWidth)
+      sf_resale_flat <- sf_resale_flat %>% mutate(supermarket_count = lengths(st_intersects(buffer_supermarket, sf_supermarket)))
+      
+      ggplot(sf_resale_flat, aes(x = input$choice , y = supermarket_count)) + geom_boxplot()
+    })
     
+    output$sport_box <- renderPlotly({
+      buffer_sport <- st_buffer(sf_resale_flat, input$sportWidth)
+      sf_resale_flat <- sf_resale_flat %>% mutate(sport_count = lengths(st_intersects(buffer_sport, sf_sport_facilities)))
+      
+      ggplot(sf_resale_flat, aes(x = input$choice , y = sport_count)) + geom_boxplot()
+    })
+    
+    output$preschool_box <- renderPlotly({
+      buffer_preschool <- st_buffer(sf_resale_flat, input$preschoolWidth)
+      sf_resale_flat <- sf_resale_flat %>% mutate(preschool_count = lengths(st_intersects(buffer_preschool, sf_preschool)))
+      
+      ggplot(sf_resale_flat, aes(x = input$choice , y = preschool_count)) + geom_boxplot()
+    })
+    
+    output$hawker_box <- renderPlotly({
+      buffer_hawker <- st_buffer(sf_resale_flat, input$hawkerWidth)
+      sf_resale_flat <- sf_resale_flat %>% mutate(hawker_count = lengths(st_intersects(buffer_hawker, sf_hawkercenter)))
+      
+      ggplot(sf_resale_flat, aes(x = input$choice , y = hawker_count)) + geom_boxplot()
+    })
+    
+    output$mall_box <- renderPlotly({
+      buffer_mall <- st_buffer(sf_resale_flat, input$mallWidth)
+      sf_resale_flat <- sf_resale_flat %>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall)))
+ 
+      ggplot(sf_resale_flat, aes(x = input$choice , y = mall_count)) + geom_boxplot()
+    })
 } 
+
+
 
 shinyApp(ui, server)
