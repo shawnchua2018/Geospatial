@@ -271,6 +271,7 @@ body <- dashboardBody(tabItems(
                                                             min = 0, 
                                                             max = 1000, 
                                                             value = c(0), step = 5)),
+                              
                                checkboxInput(inputId = "pschool", label = "Primary Schools", value= FALSE), 
                                conditionalPanel(condition = "input.pschool == true",
                                                 sliderInput(inputId = 'pschoolWidth', label = "Primary Schools (includes all primary schools in Singapore)",
@@ -321,6 +322,7 @@ body <- dashboardBody(tabItems(
                                                             max = 1000, 
                                                             value = c(0), step = 5)), 
                                actionButton("goButton", "Update Table")),
+
                       tabPanel("View Data", icon = icon("database"), 
                                h3("Select variables to view in the HDB Resale Data"), 
                                div(selectInput("month", "Month", choices=c("2020-01", "2020-02", "2020-03" , "2020-04", "2020-05", "2020-06",
@@ -332,8 +334,8 @@ body <- dashboardBody(tabItems(
                                actionButton("filter", "Filter", icon = icon("filter")),
                                DT::dataTableOutput(outputId = "popTab"), 
                                div(style = 'overflow-x: sschoocroll', tableOutput("Table"))), 
-                      tabPanel("test", tableOutput("values"))
-                      )), 
+                      tabPanel("Analysis", icon = icon("chart-bar"), 
+                               plotOutput("boxplot")), 
   tabItem("transform",div(selectInput("var", "Select Variable to Transform", choices=c("resale_price", "remaining_lease", "floor_area_sqm")), 
                              style="display:inline-block"),
           div(selectInput("mode", "Select Transformation Mode", choices=c("Log", "Exp", "Sqrt")), 
@@ -424,9 +426,15 @@ server <- function(input, output) {
         sliderValues()
       })
  
-}   
+  
+    
+    output$boxplot <- renderPlot({
+      ggplot(sf_resale_flat, aes(mrt_count)) + geom_histogram(bins = 20, 
+                                                              color = "black",
+                                                              fill = "light pink")
+    })
 
     
-
+} 
 
 shinyApp(ui, server)
