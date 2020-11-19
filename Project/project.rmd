@@ -287,51 +287,110 @@ st_crs(sf_supermarket)
 
 Creation of buffer zone code and count
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-buffer_zone <- st_buffer(sf_resale_flat, 500)
-sf_resale_flat$mrt <- lengths(st_intersects(buffer_zone, mrt))
-
-sf_resale_flat$stn <- st_intersects(buffer_zone, mrt)
-sf_resale_flat <- sf_resale_flat %>%
-  filter(mrt == 3)
+buffer_mrt <- st_buffer(sf_resale_flat, 500)
+buffer_psch <- st_buffer(sf_resale_flat, 500)
+buffer_ssch <- st_buffer(sf_resale_flat, 500)
+buffer_cc <- st_buffer(sf_resale_flat, 500)
+buffer_supermarket <- st_buffer(sf_resale_flat, 500)
+buffer_sport <- st_buffer(sf_resale_flat, 500)
+buffer_preschool <- st_buffer(sf_resale_flat, 500)
+buffer_hawker <- st_buffer(sf_resale_flat, 500)
+buffer_mall <- st_buffer(sf_resale_flat, 500)
+      
+sf_resale_flat <- sf_resale_flat %>% 
+  mutate(mrt_count = lengths(st_intersects(buffer_mrt, mrt)))%>% 
+  mutate(pri_school_count = lengths(st_intersects(buffer_psch, sf_pschool)))%>%
+  mutate(sec_school_count = lengths(st_intersects(buffer_ssch, sf_sschool)))%>%
+  mutate(community_center_count = lengths(st_intersects(buffer_cc, sf_cc)))%>%
+  mutate(supermarket_count = lengths(st_intersects(buffer_supermarket, sf_supermarket)))%>%
+  mutate(sport_count = lengths(st_intersects(buffer_sport, sf_sport_facilities)))%>%
+  mutate(preschool_count = lengths(st_intersects(buffer_preschool, sf_preschool)))%>%
+  mutate(hawker_count = lengths(st_intersects(buffer_hawker, sf_hawkercenter)))%>%
+  mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall)))
 ```
 
- output$popTab <- DT::renderDataTable({
-      buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
-      buffer_psch <- st_buffer(sf_resale_flat, input$pschoolWidth)
-      buffer_ssch <- st_buffer(sf_resale_flat, input$sschoolWidth)
-      buffer_cc <- st_buffer(sf_resale_flat, input$ccWidth)
-      buffer_supermarket <- st_buffer(sf_resale_flat, input$supermarketWidth)
-      buffer_sport <- st_buffer(sf_resale_flat, input$sportWidth)
-      buffer_preschool <- st_buffer(sf_resale_flat, input$preschoolWidth)
-    
-      buffer_hawker <- st_buffer(sf_resale_flat, input$hawkerWidth)
-      buffer_mall <- st_buffer(sf_resale_flat, input$mallWidth)
-      
-      DT::datatable(data = sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_mrt, sf_mrt)))
-                    %>% mutate(pri_school_count = lengths(st_intersects(buffer_psch, sf_pschool)))
-                    %>% mutate(sec_school_count = lengths(st_intersects(buffer_ssch, sf_sschool)))
-                    %>% mutate(community_center_count = lengths(st_intersects(buffer_cc, sf_cc)))
-                    %>% mutate(supermarket_count = lengths(st_intersects(buffer_supermarket, sf_supermarket)))
-                    %>% mutate(sport_count = lengths(st_intersects(buffer_sport, sf_sport_facilities)))
-                    %>% mutate(preschool_count = lengths(st_intersects(buffer_preschool, sf_preschool)))
-                    
-                    %>% mutate(hawker_count = lengths(st_intersects(buffer_hawker, sf_hawkercenter)))
-                    %>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall))),
-                    extensions = c("FixedColumns", "FixedHeader", "Scroller"), 
-                    options = list(
-                      searching = TRUE,
-                      autoWidth = TRUE,
-                      rownames = FALSE,
-                      scroller = TRUE,
-                      scrollX = TRUE,
-                      scrollY = "500px",
-                      fixedHeader = FALSE,
-                      class = 'cell-border stripe',
-                      fixedColumns = list(
-                        leftColumns = 3,
-                        heightMatch = 'none'
-                        
-                      )
-                    )
-      )
-    })
+
+GWR
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+sf_resale_flat <- sf_resale_flat%>%
+  mutate(`resale_price`= as.numeric(`resale_price`))
+ggplot(data = sf_resale_flat, aes(x=`resale_price`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+sf_resale_flat <- sf_resale_flat %>%
+  mutate(`log_resale_price` = log(`resale_price`))
+ggplot(data = sf_resale_flat, aes(x=`log_resale_price`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+test = st_drop_geometry(sf_resale_flat)
+test[10:18]
+corrplot(cor(test[, 10:18]), diag = FALSE, order = "AOE", tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+resale_flat.mlr <- lm(formula = resale_price ~ floor_area_sqm + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + sport_count + preschool_count + hawker_count + mall_count, data=sf_resale_flat)
+summary(resale_flat.mlr)
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+sf_resale_flat <- sf_resale_flat[-c(4540,9963), ]
+resale_flat.mlr1 <- lm(formula = resale_price ~ floor_area_sqm + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count +preschool_count + hawker_count + mall_count, data=sf_resale_flat)
+ols_regress(resale_flat.mlr1)
+
+#resale_flat.mlr1 <- lm(formula = resale_price ~ floor_area_sqm101+floor_area_sqm102+floor_area_sqm103+floor_area_sqm104+floor_area_sqm105+floor_area_sqm107+floor_area_sqm109+floor_area_sqm110+ floor_area_sqm111+floor_area_sqm112+floor_area_sqm113+floor_area_sqm114+floor_area_sqm115+floor_area_sqm116+floor_area_sqm117+floor_area_sqm118+floor_area_sqm119+floor_area_sqm120+floor_area_sqm121+floor_area_sqm122+floor_area_sqm123+floor_area_sqm124+floor_area_sqm125+floor_area_sqm126+floor_area_sqm127+floor_area_sqm128+floor_area_sqm129+floor_area_sqm130+floor_area_sqm131+floor_area_sqm132+floor_area_sqm133+floor_area_sqm134+floor_area_sqm135+floor_area_sqm137+floor_area_sqm138+floor_area_sqm139+floor_area_sqm140+floor_area_sqm141+floor_area_sqm142+floor_area_sqm143+floor_area_sqm144+ floor_area_sqm145+floor_area_sqm146+floor_area_sqm147+floor_area_sqm148+floor_area_sqm149+floor_area_sqm150+floor_area_sqm151+floor_area_sqm152+floor_area_sqm153+floor_area_sqm154+floor_area_sqm155+floor_area_sqm156+floor_area_sqm157+floor_area_sqm161+floor_area_sqm162+floor_area_sqm163+floor_area_sqm164+floor_area_sqm165+floor_area_sqm169+floor_area_sqm171+floor_area_sqm173+floor_area_sqm174+floor_area_sqm176+floor_area_sqm177+floor_area_sqm178+floor_area_sqm179+floor_area_sqm181+floor_area_sqm186+floor_area_sqm189+floor_area_sqm192+floor_area_sqm31+floor_area_sqm34+floor_area_sqm35+floor_area_sqm39+floor_area_sqm40+floor_area_sqm41+floor_area_sqm42+floor_area_sqm43+floor_area_sqm44+floor_area_sqm45+floor_area_sqm46+floor_area_sqm47+floor_area_sqm48+floor_area_sqm50+floor_area_sqm51+floor_area_sqm52+floor_area_sqm53+floor_area_sqm54+floor_area_sqm55+floor_area_sqm56+floor_area_sqm57+floor_area_sqm58+floor_area_sqm59+floor_area_sqm60+floor_area_sqm60.3+floor_area_sqm61+floor_area_sqm63+floor_area_sqm63.1+floor_area_sqm64+floor_area_sqm65+floor_area_sqm66+floor_area_sqm67+floor_area_sqm68+floor_area_sqm69+floor_area_sqm70+floor_area_sqm71+floor_area_sqm72+floor_area_sqm73+floor_area_sqm74+floor_area_sqm75+floor_area_sqm76+floor_area_sqm77+floor_area_sqm78+floor_area_sqm79+floor_area_sqm80+floor_area_sqm82+floor_area_sqm84+floor_area_sqm87+floor_area_sqm91+floor_area_sqm95+floor_area_sqm97+mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data=sf_resale_flat)
+#ols_regress(resale_flat.mlr1)
+
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+ols_vif_tol(resale_flat.mlr1)
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+mlr.output <- as.data.frame(resale_flat.mlr1$residuals)
+sf_resale_flat.res <- cbind(sf_resale_flat, mlr.output$`resale_flat.mlr1$residuals`) %>%
+rename(`MLR_RES` = `mlr.output..resale_flat.mlr1.residuals.`)
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+sp_resale_flat <- as_Spatial(sf_resale_flat.res)
+#sp_resale_flat <- sp_resale_flat[-c(4540,9963), ]
+sp_resale_flat
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE, fig.retina=3}
+#tmap_mode("view")
+#tm_shape(sf_mpsz2019)+
+#  tm_polygons(alpha = 0.4) +
+#tm_shape(sf_resale_flat.res) +  
+#  tm_dots(col = "MLR_RES",
+#          alpha = 0.6,
+#          style="quantile") +
+#  tm_view(set.zoom.limits = c(11,14))
+tmap_mode("plot")
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+nb <- dnearneigh(coordinates(sp_resale_flat), 0, 1500, longlat = FALSE)
+summary(nb)
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+nb_lw <- nb2listw(nb, style = 'W')
+summary(nb_lw)
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+lm.morantest(resale_flat.mlr1, nb_lw)
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+#bw.fixed <- bw.gwr(formula = resale_price ~ floor_area_sqm + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data=sp_resale_flat, approach="CV", kernel="bisquare", adaptive=FALSE, longlat=FALSE)
+#bw.fixed <- bw.gwr(formula = resale_price + mrt_count~ floor_area_sqm, data=sp_resale_flat, approach="CV", kernel="gaussian", adaptive=FALSE, longlat=FALSE)
+
+#bw.adaptive <- bw.gwr(formula = resale_price ~ floor_area_sqm + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count +preschool_count + hawker_count + mall_count, data = sp_resale_flat, approach="CV", kernel="gaussian", adaptive=TRUE, longlat=FALSE)
+
+set.seed(0)
+gwr.fixed <- gwr.basic(formula = resale_price ~ floor_area_sqm + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data = sp_resale_flat, bw=100, kernel = 'gaussian', longlat = FALSE)
+```
