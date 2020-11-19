@@ -136,10 +136,12 @@ hawkercenter = st_read("data/geospatial/hawker-centres-kml.kml")
 cc = st_read("data/geospatial/community-clubs-kml.kml")
 
 parks = st_read("data/geospatial/nparks-parks-kml.kml")
+parks = st_centroid(parks)
 
 supermarket = st_read("data/geospatial/supermarkets-kml.kml")
 
 sport_facilities = st_read("data/geospatial/sportsg-sport-facilities-kml.kml")
+sport_facilities = st_centroid(sport_facilities)
 
 sf_mpsz2019 = st_read("data/geospatial/master-plan-2019-subzone-boundary-no-sea-kml.kml")
 
