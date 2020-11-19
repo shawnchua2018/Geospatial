@@ -42,24 +42,65 @@ sf_resale_flat <- st_as_sf(resale_flat, coords = c("X","Y"),crs= 3414)
 ```
 Schools CSV
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-school = st_read("data/aspatial/Schools.csv")
+#school = st_read("data/aspatial/Schools.csv")
 
-school$latitude <- as.numeric(school$latitude)
-school$longitude <- as.numeric(school$longitude)
+#school$latitude <- as.numeric(school$latitude)
+#school$longitude <- as.numeric(school$longitude)
 
-cord.dec.sch = SpatialPoints(cbind(school$longitude, school$latitude), proj4string=CRS("+proj=longlat"))
+#cord.dec.sch = SpatialPoints(cbind(school$longitude, school$latitude), #proj4string=CRS("+proj=longlat"))
 
-cord.UTM.sch <- spTransform(cord.dec.sch, CRS("+init=epsg:3414"))
-cord.UTM.sch
+#cord.UTM.sch <- spTransform(cord.dec.sch, CRS("+init=epsg:3414"))
+#cord.UTM.sch
 
-new_coords_sch <- data.frame(cord.UTM.sch@coords)
-summary(new_coords_sch)
-new_coords_sch <- new_coords_sch %>%
+#new_coords_sch <- data.frame(cord.UTM.sch@coords)
+#summary(new_coords_sch)
+#new_coords_sch <- new_coords_sch %>%
+#  rename(X = coords.x1, Y = coords.x2)
+
+#school <- cbind(school, "X" = new_coords_sch[1], "Y" = new_coords_sch[2])
+
+#sf_school <- st_as_sf(school, coords = c("X","Y"),crs= 3414)
+
+#Pri school
+pschool = st_read("data/aspatial/Primary_school.csv")
+
+pschool$latitude <- as.numeric(pschool$latitude)
+pschool$longitude <- as.numeric(pschool$longitude)
+
+cord.dec.psch = SpatialPoints(cbind(pschool$longitude, pschool$latitude), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.psch <- spTransform(cord.dec.psch, CRS("+init=epsg:3414"))
+cord.UTM.psch
+
+new_coords_psch <- data.frame(cord.UTM.psch@coords)
+summary(new_coords_psch)
+new_coords_psch <- new_coords_psch %>%
   rename(X = coords.x1, Y = coords.x2)
 
-school <- cbind(school, "X" = new_coords_sch[1], "Y" = new_coords_sch[2])
+pschool <- cbind(pschool, "X" = new_coords_psch[1], "Y" = new_coords_psch[2])
 
-sf_school <- st_as_sf(school, coords = c("X","Y"),crs= 3414)
+sf_pschool <- st_as_sf(pschool, coords = c("X","Y"),crs= 3414)
+
+#sec school
+sschool = st_read("data/aspatial/Secondary_school.csv")
+
+sschool$latitude <- as.numeric(sschool$latitude)
+sschool$longitude <- as.numeric(sschool$longitude)
+
+cord.dec.ssch = SpatialPoints(cbind(sschool$longitude, sschool$latitude), proj4string=CRS("+proj=longlat"))
+
+cord.UTM.ssch <- spTransform(cord.dec.ssch, CRS("+init=epsg:3414"))
+cord.UTM.ssch
+
+new_coords_ssch <- data.frame(cord.UTM.ssch@coords)
+summary(new_coords_ssch)
+new_coords_ssch <- new_coords_ssch %>%
+  rename(X = coords.x1, Y = coords.x2)
+
+sschool <- cbind(sschool, "X" = new_coords_ssch[1], "Y" = new_coords_ssch[2])
+
+sf_sschool <- st_as_sf(sschool, coords = c("X","Y"),crs= 3414)
+
 ```
 
 Shopping Malls CSV 
