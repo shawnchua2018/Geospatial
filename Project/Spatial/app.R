@@ -30,7 +30,7 @@ new_coords <- new_coords %>%
 
 resale_flat <- cbind(resale_flat, "X" = new_coords[1], "Y" = new_coords[2])
 
-resale_flat = resale_flat[,!(names(resale_flat) %in% c("month","flat_model","lease_commence_date","longitude","latitude"))]
+resale_flat = resale_flat[,!(names(resale_flat) %in% c("flat_model","lease_commence_date","longitude","latitude"))]
 
 sf_resale_flat <- st_as_sf(resale_flat, coords = c("X","Y"),crs= 3414)
 
@@ -320,8 +320,7 @@ body <- dashboardBody(tabItems(
                                                 sliderInput(inputId = 'mallWidth', label = "Shopping Malls (includes all shopping malls in Singapore)",
                                                             min = 0, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5)), 
-                               actionButton("goButton", "Update Table")),
+                                                            value = c(0), step = 5))),
 
                       tabPanel("View Data", icon = icon("database"), 
                                h3("Select variables to view in the HDB Resale Data"), 
@@ -330,8 +329,7 @@ body <- dashboardBody(tabItems(
                                    style="display:inline-block"),
                                div(selectInput("flat", "Flat Type", choices=c("1 ROOM", "2 ROOM", "3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE", "MULTI-GENERATION" )), 
                                    style="display:inline-block"),
-                               br(), 
-                               actionButton("filter", "Filter", icon = icon("filter")),
+                               br(),
                                DT::dataTableOutput(outputId = "popTab"), 
                                div(style = 'overflow-x: sschoocroll', tableOutput("Table"))), 
                       tabPanel("Analysis", icon = icon("chart-bar"),
@@ -412,7 +410,9 @@ server <- function(input, output) {
                     %>% mutate(preschool_count = lengths(st_intersects(buffer_preschool, sf_preschool)))
                     
                     %>% mutate(hawker_count = lengths(st_intersects(buffer_hawker, sf_hawkercenter)))
-                    %>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall))),
+                    %>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall)))
+                    %>% mutate(month = input$month)
+                    %>% mutate(flat_type = input$flat),
                     extensions = c("FixedColumns", "FixedHeader", "Scroller"), 
                     options = list(
                       searching = TRUE,
@@ -430,6 +430,8 @@ server <- function(input, output) {
                       )
                     )
       )
+      
+      
     })
 
     
@@ -453,7 +455,8 @@ server <- function(input, output) {
         sliderValues()
       })
  
-  
+    
+    
     
     output$mrt_box <- renderPlotly({
       buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
