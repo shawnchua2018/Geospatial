@@ -329,7 +329,9 @@ body <- dashboardBody(tabItems(
                                    style="display:inline-block"),
                                div(selectInput("flat", "Flat Type", choices=c("1 ROOM", "2 ROOM", "3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE", "MULTI-GENERATION" )), 
                                    style="display:inline-block"),
+                               div(selectInput("sample", "Sample Number", choices = c("100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"))),
                                br(),
+                               
                                DT::dataTableOutput(outputId = "popTab"), 
                                div(style = 'overflow-x: sschoocroll', tableOutput("Table"))), 
                       tabPanel("Analysis", icon = icon("chart-bar"),
@@ -363,7 +365,7 @@ body <- dashboardBody(tabItems(
 
 
 
-ui <- dashboardPage(header, sidebar, body, skin = "red")
+ui <- dashboardPage(header, sidebar, body, skin = "red",)
 
 server <- function(input, output) {
     set.seed(122)
