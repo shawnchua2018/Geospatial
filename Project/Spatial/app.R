@@ -241,8 +241,6 @@ sidebar <- dashboardSidebar(
                  tabName = "overview", icon= icon("building")), 
         menuItem("Feature Settings", 
                  tabName = "settings", icon = icon("sliders-h")),
-        menuItem("Transform", 
-                 tabName = "transform", icon= icon("chart-bar")),
         menuItem("GWR Modelling", 
                  tabName = "GWR", icon= icon("map-marked-alt"))
     )
@@ -329,7 +327,8 @@ body <- dashboardBody(tabItems(
                                    style="display:inline-block"),
                                div(selectInput("flat", "Flat Type", choices=c("1 ROOM", "2 ROOM", "3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE", "MULTI-GENERATION" )), 
                                    style="display:inline-block"),
-                               div(selectInput("sample", "Sample Number", choices = c("100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"))),
+                               div(selectInput("sample", "Sample Size", choices = c("100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"))),
+                               p(strong("Note: The larger the sample size, the longer it takes for the GWR model to run")),
                                br(),
                                
                                DT::dataTableOutput(outputId = "popTab"), 
@@ -355,13 +354,29 @@ body <- dashboardBody(tabItems(
                                conditionalPanel(condition = "input.mall == true",
                                plotlyOutput("mall_box"))
                                ))), 
-  tabItem("transform",div(selectInput("var", "Select Variable to Transform", choices=c("resale_price", "remaining_lease", "floor_area_sqm")), 
-                             style="display:inline-block"),
-          div(selectInput("mode", "Select Transformation Mode", choices=c("Log", "Exp", "Sqrt")), 
-              style="display:inline-block"),
-          br(), 
-          actionButton("trans", "Transform", icon = icon("exchange-alt"))),
-  tabItem(tabName="GWR"))) 
+  tabItem(tabName="GWR", 
+          tabsetPanel(tabPanel("Settings", icon = icon("cogs"),
+                               h3("Bandwidth Selection"),
+                               materialSwitch(inputId = "auto", label = strong("Auto Bandwidth"), status = "danger"),
+                               numericInput("bandwidth", "Input Bandwidth: ", 10,
+                                            min = NA,
+                                            max = NA,
+                                            step = NA,
+                                            width = NULL), 
+                               h3("Kernel Selection"), 
+                               materialSwitch(inputId = "kauto", label = strong("Adaptive Kernel"), status = "danger"), 
+                               selectInput(inputId = "kernel", label = "Select Kernel type: ", 
+                                           choices = c("Gaussian", "Exponential", "Bi-square", "Tricube", "Boxcar")), 
+                               br()),
+                      tabPanel("Fixed Bandwidth", icon = icon("ruler"),
+                               tabsetPanel(tabPanel("GWR Map", icon= icon("map")), 
+                                           tabPanel("GWR Data Output", icon= icon("file-excel")))), 
+                      tabPanel("Adaptive Bandwidth",icon = icon("ruler"),
+                               tabsetPanel(tabPanel("GWR Map", icon= icon("map")), 
+                                           tabPanel("GWR Data Output", icon = icon("file-excel"))))
+                               
+                               
+                               )))) 
 
 
 
@@ -383,7 +398,7 @@ server <- function(input, output) {
     })
     
     
-  
+
     
     output$new_resale_flat_plot <- renderPlot({
     
