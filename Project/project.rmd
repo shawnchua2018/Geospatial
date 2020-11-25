@@ -340,14 +340,16 @@ corrplot(cor(test[, 2:13]), diag = FALSE, order = "AOE", tl.pos = "td", tl.cex =
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 #Building a hedonic pricing model using multiple linear regression method
-resale_flat.mlr <- lm(formula = resale_price ~ remaining_lease_nearest_year + flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + sport_count + preschool_count + hawker_count + mall_count, data=sf_resale_flat)
+#resale_flat.mlr <- lm(formula = resale_price ~ remaining_lease_nearest_year + flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + sport_count + preschool_count + hawker_count + mall_count, data=sf_resale_flat)
+
+resale_flat.mlr <- lm(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + sport_count + preschool_count + hawker_count + mall_count, data=sf_resale_flat)
 summary(resale_flat.mlr)
 ```
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 # remove sport count 
 #sf_resale_flat <- sf_resale_flat[-c(4540,9963), ]
-resale_flat.mlr1 <- lm(formula = resale_price ~ remaining_lease_nearest_year + flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data=sf_resale_flat)
+resale_flat.mlr1 <- lm(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + sport_count + preschool_count + hawker_count + mall_count, data=sf_resale_flat)
 ols_regress(resale_flat.mlr1)
 
 ```
@@ -400,6 +402,16 @@ nb <- dnearneigh(coordinates(sp_resale_flat), 0, 2000, longlat = FALSE)
 #card(nb)
 summary(nb)
 ```
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+cnt <- card(nb)
+ind <- match(0, cnt)
+#print(island_ind)
+nearest <- knearneigh(coordinates(sp_resale_flat))$nn
+nb[[ind]] <- nearest[ind]
+
+# We need to add this island to the neighbours of its connected municipality as well
+nb[[nearest[ind]]] <- c(as.integer(100), as.integer(nb[[nearest[ind]]]))
+```
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 nb_lw <- nb2listw(nb, style = 'W')
@@ -445,6 +457,47 @@ tmap_mode("view")
 tm_shape(sf_mpsz2019)+
   tm_polygons(alpha = 0.1) +
 tm_shape(resale.sf.fixed) +  
+  tm_dots(col = "Local_R2",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+tmap_mode("plot")
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+bw.adaptive <- bw.gwr(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data=sp_resale_flat, approach="CV", kernel="gaussian",
+adaptive=TRUE, longlat=FALSE)
+
+gwr.adaptive <- gwr.basic(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data=sp_resale_flat, bw=bw.adaptive, kernel = 'gaussian', adaptive=TRUE, longlat = FALSE)
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+gwr.adaptive
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+resale.sf.adaptive <- st_as_sf(gwr.adaptive$SDF) %>%
+  st_transform(crs=3414)
+
+resale.sf.adaptive.svy21 <- st_transform(resale.sf.adaptive, 3414)
+resale.sf.adaptive.svy21  
+
+gwr.adaptive.output <- as.data.frame(gwr.adaptive$SDF)
+resale.sf.adaptive <- cbind(sf_resale_flat.res, as.matrix(gwr.adaptive.output))
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+summary(gwr.adaptive$SDF$yhat)
+```
+
+```{r echo=TRUE, message=FALSE, warning= FALSE}
+tmap_mode("view")
+tm_shape(sf_mpsz2019)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(resale.sf.adaptive) +  
   tm_dots(col = "Local_R2",
           border.col = "gray60",
           border.lwd = 1) +
