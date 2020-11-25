@@ -287,15 +287,15 @@ st_crs(sf_supermarket)
 
 Creation of buffer zone code and count
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-buffer_mrt <- st_buffer(sf_resale_flat, 500)
-buffer_psch <- st_buffer(sf_resale_flat, 500)
-buffer_ssch <- st_buffer(sf_resale_flat, 500)
-buffer_cc <- st_buffer(sf_resale_flat, 500)
-buffer_supermarket <- st_buffer(sf_resale_flat, 500)
-buffer_sport <- st_buffer(sf_resale_flat, 500)
-buffer_preschool <- st_buffer(sf_resale_flat, 500)
-buffer_hawker <- st_buffer(sf_resale_flat, 500)
-buffer_mall <- st_buffer(sf_resale_flat, 500)
+buffer_mrt <- st_buffer(sf_resale_flat, 0)
+buffer_psch <- st_buffer(sf_resale_flat, 0)
+buffer_ssch <- st_buffer(sf_resale_flat, 0)
+buffer_cc <- st_buffer(sf_resale_flat, 0)
+buffer_supermarket <- st_buffer(sf_resale_flat, 0)
+buffer_sport <- st_buffer(sf_resale_flat, 0)
+buffer_preschool <- st_buffer(sf_resale_flat, 0)
+buffer_hawker <- st_buffer(sf_resale_flat, 0)
+buffer_mall <- st_buffer(sf_resale_flat, 0)
       
 sf_resale_flat <- sf_resale_flat %>% 
   mutate(mrt_count = lengths(st_intersects(buffer_mrt, mrt)))%>% 

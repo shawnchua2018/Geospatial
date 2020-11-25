@@ -4,7 +4,7 @@ library(shinydashboard)
 library(shinyWidgets)
 library(DT)
 
-packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster','plotly')
+packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster','plotly', 'leaflet')
 for (p in packages){
   if(!require(p, character.only = T)){
     install.packages(p)
@@ -232,7 +232,6 @@ st_crs(sf_supermarket)
 
 
 
-
 header <- dashboardHeader(title = "$patial")
 
 sidebar <- dashboardSidebar(
@@ -369,10 +368,10 @@ body <- dashboardBody(tabItems(
                                            choices = c("Gaussian", "Exponential", "Bi-square", "Tricube", "Boxcar")), 
                                br()),
                       tabPanel("Fixed Bandwidth", icon = icon("ruler"),
-                               tabsetPanel(tabPanel("GWR Map", icon= icon("map")), 
+                               tabsetPanel(tabPanel("GWR Map", icon= icon("map"), plotOutput("fixed_plot")), 
                                            tabPanel("GWR Data Output", icon= icon("file-excel")))), 
                       tabPanel("Adaptive Bandwidth",icon = icon("ruler"),
-                               tabsetPanel(tabPanel("GWR Map", icon= icon("map")), 
+                               tabsetPanel(tabPanel("GWR Map", icon= icon("map"),DT::dataTableOutput(outputId = "testTab")), 
                                            tabPanel("GWR Data Output", icon = icon("file-excel"))))
                                
                                
@@ -387,18 +386,16 @@ server <- function(input, output) {
     histdata <- rnorm(500)
     
 
-    new_resale_flat <- reactive({
-      sf_resale_flat %>%
-        mutate(mrt_buffer = st_buffer(sf_resale_flat, input$mrtWidth))
-        #mutate(mrt_count = lengths(st_intersects(sf_resale_flat$mrt_buffer, mrt)))
-    })
+    #sample_resale_flat <- reactive({
+      #testtest <- as_Spatial(sf_resale_flat)
+      #testtest <- testtest[sample(1:length(testtest),input$sample),]
+      #sample_resale_flat <- st_as_sf(testtest)
+    #})
     
     output$new_resale_flat <- renderTable({
       new_resale_flat()
     })
     
-    
-
     
     output$new_resale_flat_plot <- renderPlot({
     
@@ -406,7 +403,10 @@ server <- function(input, output) {
   
     })
     
-    output$popTab <-DT::renderDataTable({
+   processed_table <- reactive({
+      testtest <- as_Spatial(sf_resale_flat)
+      testtest <- testtest[sample(1:length(testtest),input$sample),]
+      sf_resale_flat <- st_as_sf(testtest)
       buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
       buffer_psch <- st_buffer(sf_resale_flat, input$pschoolWidth)
       buffer_ssch <- st_buffer(sf_resale_flat, input$sschoolWidth)
@@ -414,22 +414,51 @@ server <- function(input, output) {
       buffer_supermarket <- st_buffer(sf_resale_flat, input$supermarketWidth)
       buffer_sport <- st_buffer(sf_resale_flat, input$sportWidth)
       buffer_preschool <- st_buffer(sf_resale_flat, input$preschoolWidth)
-      
       buffer_hawker <- st_buffer(sf_resale_flat, input$hawkerWidth)
       buffer_mall <- st_buffer(sf_resale_flat, input$mallWidth)
       
-      DT::datatable(data = sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_mrt, sf_mrt)))
-                    %>% mutate(pri_school_count = lengths(st_intersects(buffer_psch, sf_pschool)))
-                    %>% mutate(sec_school_count = lengths(st_intersects(buffer_ssch, sf_sschool)))
-                    %>% mutate(community_center_count = lengths(st_intersects(buffer_cc, sf_cc)))
-                    %>% mutate(supermarket_count = lengths(st_intersects(buffer_supermarket, sf_supermarket)))
-                    %>% mutate(sport_count = lengths(st_intersects(buffer_sport, sf_sport_facilities)))
-                    %>% mutate(preschool_count = lengths(st_intersects(buffer_preschool, sf_preschool)))
+      sf_resale_flat <- sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_mrt, sf_mrt)))
+      sf_resale_flat <- sf_resale_flat %>% mutate(pri_school_count = lengths(st_intersects(buffer_psch, sf_pschool)))
+      sf_resale_flat <- sf_resale_flat %>% mutate(sec_school_count = lengths(st_intersects(buffer_ssch, sf_sschool)))
+      sf_resale_flat <- sf_resale_flat %>% mutate(community_center_count = lengths(st_intersects(buffer_cc, sf_cc)))
+      sf_resale_flat <- sf_resale_flat %>% mutate(supermarket_count = lengths(st_intersects(buffer_supermarket, sf_supermarket)))
+      sf_resale_flat <- sf_resale_flat %>% mutate(sport_count = lengths(st_intersects(buffer_sport, sf_sport_facilities)))
+      sf_resale_flat <- sf_resale_flat %>% mutate(preschool_count = lengths(st_intersects(buffer_preschool, sf_preschool)))
+      sf_resale_flat <- sf_resale_flat %>% mutate(hawker_count = lengths(st_intersects(buffer_hawker, sf_hawkercenter)))
+      sf_resale_flat <- sf_resale_flat %>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall)))
+      #sf_resale_flat <- sf_resale_flat %>% mutate(month = input$month)
+      #sf_resale_flat <- sf_resale_flat %>% mutate(flat_type = input$flat)
+    })
+    
+    output$popTab <-DT::renderDataTable({
+      #testtest <- as_Spatial(sf_resale_flat)
+      #testtest <- testtest[sample(1:length(testtest),input$sample),]
+      #sample_resale_flat <- st_as_sf(testtest)
+      #sf_resale_flat <- sample_resale_flat()
+      #buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
+      #buffer_psch <- st_buffer(sf_resale_flat, input$pschoolWidth)
+      #buffer_ssch <- st_buffer(sf_resale_flat, input$sschoolWidth)
+      #buffer_cc <- st_buffer(sf_resale_flat, input$ccWidth)
+      #buffer_supermarket <- st_buffer(sf_resale_flat, input$supermarketWidth)
+      #buffer_sport <- st_buffer(sf_resale_flat, input$sportWidth)
+      #buffer_preschool <- st_buffer(sf_resale_flat, input$preschoolWidth)
+      
+      #buffer_hawker <- st_buffer(sf_resale_flat, input$hawkerWidth)
+      #buffer_mall <- st_buffer(sf_resale_flat, input$mallWidth)
+      
+      DT::datatable(#data = sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_mrt, sf_mrt)))
+                    #%>% mutate(pri_school_count = lengths(st_intersects(buffer_psch, sf_pschool)))
+                    #%>% mutate(sec_school_count = lengths(st_intersects(buffer_ssch, sf_sschool)))
+                    #%>% mutate(community_center_count = lengths(st_intersects(buffer_cc, sf_cc)))
+                    #%>% mutate(supermarket_count = lengths(st_intersects(buffer_supermarket, sf_supermarket)))
+                    #%>% mutate(sport_count = lengths(st_intersects(buffer_sport, sf_sport_facilities)))
+                    #%>% mutate(preschool_count = lengths(st_intersects(buffer_preschool, sf_preschool)))
                     
-                    %>% mutate(hawker_count = lengths(st_intersects(buffer_hawker, sf_hawkercenter)))
-                    %>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall)))
-                    %>% mutate(month = input$month)
-                    %>% mutate(flat_type = input$flat),
+                    #%>% mutate(hawker_count = lengths(st_intersects(buffer_hawker, sf_hawkercenter)))
+                    #%>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall)))
+                    #%>% mutate(month = input$month)
+                    #%>% mutate(flat_type = input$flat),
+                    data = processed_table(),
                     extensions = c("FixedColumns", "FixedHeader", "Scroller"), 
                     options = list(
                       searching = TRUE,
@@ -451,9 +480,73 @@ server <- function(input, output) {
       
     })
 
+    restable <- reactive({
+      sf_resale_flat <- processed_table()
+      resale_flat.mlr <- lm(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + sport_count + preschool_count + hawker_count + mall_count, data=sf_resale_flat)
+      mlr.output <- as.data.frame(resale_flat.mlr$residuals)
+      sf_resale_flat.res <- cbind(sf_resale_flat, mlr.output$`resale_flat.mlr$residuals`)%>%rename(`MLR_RES` = `mlr.output..resale_flat.mlr.residuals.`)
+    })
     
+    output$testTab <-DT::renderDataTable({
+      DT::datatable(data = processed_table(),
+                    extensions = c("FixedColumns", "FixedHeader", "Scroller"), 
+                    options = list(
+                      searching = TRUE,
+                      autoWidth = TRUE,
+                      rownames = FALSE,
+                      scroller = TRUE,
+                      scrollX = TRUE,
+                      scrollY = "500px",
+                      fixedHeader = FALSE,
+                      class = 'cell-border stripe',
+                      fixedColumns = list(
+                        leftColumns = 3,
+                        heightMatch = 'none'
+                        
+                      )
+                    )
+      )
+    })
     
-   
+    GWR_fixed <- reactive({
+      sf_resale_flat <- restable()
+      sp_resale_flat <- as_Spatial(sf_resale_flat)
+      bw.fixed <- bw.gwr(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data=sp_resale_flat, approach="CV", kernel="gaussian", adaptive=FALSE, longlat=FALSE)
+      #bw.fixed
+      set.seed(0)
+      gwr.fixed <- gwr.basic(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data = sp_resale_flat, bw=bw.fixed, kernel = 'gaussian', longlat = FALSE)
+      #gwr.fixed
+      })
+    
+    GWR_plot <- reactive({
+      gwr.fixed <- GWR_fixed()
+      resale.sf.fixed <- st_as_sf(gwr.fixed$SDF)%>%st_transform(crs=3414)
+      resale.sf.fixed.svy21 <- st_transform(resale.sf.fixed, 3414)
+      gwr.fixed.output <- as.data.frame(gwr.fixed$SDF)
+      resale.sf.fixed <- cbind(restable(), as.matrix(gwr.fixed.output))
+      })
+    
+    output$res_plot <- renderPlot({
+      tm_shape(sf_mpsz2019)+
+        tm_fill()+
+        tm_borders(lwd = 1, alpha = 1) +
+        tm_shape(restable()) +  
+        tm_dots(col = "MLR_RES",
+                alpha = 0.6,
+                style="quantile") +
+        tm_view(set.zoom.limits = c(11,14))
+    })
+    
+    output$fixed_plot <- renderPlot({
+      tm_shape(sf_mpsz2019)+
+        tm_fill()+
+        tm_borders(lwd = 1, alpha = 1) +
+        tm_shape(GWR_plot()) +  
+        tm_dots(col = "Local_R2",
+                border.col = "gray60",
+                border.lwd = 1) +
+        tm_view(set.zoom.limits = c(11,14))
+    })
   
 
 
