@@ -332,8 +332,45 @@ body <- dashboardBody(tabItems(
                                
                                DT::dataTableOutput(outputId = "popTab"), 
                                div(style = 'overflow-x: sschoocroll', tableOutput("Table"))), 
-                      tabPanel("Analysis", icon = icon("chart-bar"),
-                               selectInput("choice", "Choice of Town", choices = c(sf_resale_flat$town)),
+                      tabPanel("Analysis", icon = icon("chart-bar"), tabsetPanel(tabPanel("Histogram", "Histogram of Table Data", icon = icon("poll"),
+                                                                                          p("Histogram of Resale Flat Price"),
+                                                                                          plotlyOutput("resale"),
+                                                                                          p("Histogram of Floor Area"),
+                                                                                          plotlyOutput("floorarea"),
+                                                                                          p("Histogram of Flat Type"),
+                                                                                          p("Legend: 1 - 1 Room Flat, 2 - 2 Room Flat, 3 - 3 Room Flat , 4 - 4 Room Flat, 5 - 5 Room Flat, 6 - Executive, 7 - Multi-Generation"),
+                                                                                          plotlyOutput("flattype"),
+                                                                                          conditionalPanel(condition = "input.mrt == true", 
+                                                                                                           p("Histogram of MRT Count"),
+                                                                                                           plotlyOutput("mrt_hist")),
+                                                                                          conditionalPanel("input.pschool == true",
+                                                                                                           p("Histogram of Primary School Count"),
+                                                                                                           plotlyOutput("pschool_hist")),
+                                                                                          conditionalPanel(condition = "input.sschool == true",
+                                                                                                           p("Histogram of Secondary School Count"),
+                                                                                                           plotlyOutput("sschool_hist")),
+                                                                                          conditionalPanel(condition = "input.cc == true",
+                                                                                                           p("Histogram of Community Center Count"),
+                                                                                                           plotlyOutput("cc_hist")),
+                                                                                          conditionalPanel(condition = "input.supermarket == true",
+                                                                                                           p("Histogram of Supermarket Count"),
+                                                                                                           plotlyOutput("supermarket_hist")),
+                                                                                          conditionalPanel(condition = "input.sport == true",
+                                                                                                           p("Histogram of Sports Facilities Count"),
+                                                                                                           plotlyOutput("sport_hist")),
+                                                                                          conditionalPanel(condition = "input.preschool == true",
+                                                                                                           p("Histogram of Preschool Count"),
+                                                                                                           plotlyOutput("preschool_hist")),
+                                                                                          conditionalPanel(condition = "input.hawker == true",
+                                                                                                           p("Histogram of Hawker Center Count"),
+                                                                                                           plotlyOutput("hawker_hist")),
+                                                                                          conditionalPanel(condition = "input.mall == true",
+                                                                                                           p("Histogram of Shopping Mall Count"),
+                                                                                                           plotlyOutput("mall_hist"))), 
+                               tabPanel("Boxplot", "Boxplot of Table Data",
+                                        plotlyOutput("resale_box"),
+                                        plotlyOutput("floorarea_box"), 
+                                        plotlyOutput("flattype_box"),
                                conditionalPanel(condition = "input.mrt == true",
                                plotlyOutput("mrt_box")),
                                conditionalPanel("input.pschool == true",
@@ -351,8 +388,7 @@ body <- dashboardBody(tabItems(
                                conditionalPanel(condition = "input.hawker == true",
                                plotlyOutput("hawker_box")),
                                conditionalPanel(condition = "input.mall == true",
-                               plotlyOutput("mall_box"))
-                               ))), 
+                               plotlyOutput("mall_box"))))))), 
   tabItem(tabName="GWR", 
           tabsetPanel(tabPanel("Settings", icon = icon("cogs"),
                                h3("Bandwidth Selection"),
@@ -405,7 +441,7 @@ body <- dashboardBody(tabItems(
                                            tabPanel("GWR Data Output", icon = icon("file-excel"))))
                                
                                
-                               )))) 
+                               ))))
 
 
 
@@ -776,6 +812,72 @@ server <- function(input, output) {
       })
  
     
+    
+    output$resale <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`resale_price`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+
+    output$floorarea <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`floor_area_sqm`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+    output$flattype <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`flat_type_code`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    }) 
+    
+    output$mrt_hist <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`mrt_count`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+    output$pschool_hist <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`pri_school_count`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+    output$sschool_hist <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`sec_school_count`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+    output$cc_hist <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`community_center_count`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+    output$supermarket_hist <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`supermarket_count`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+    output$sport_hist <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`sport_count`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+    output$preschool_hist <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`preschool_count`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+    output$hawker_hist <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`hawker_count`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+    output$mall_hist <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      ggplot(data= sf_resale_flat, aes(x=as.numeric(`mall_count`))) +geom_histogram(bins=20, color="black", fill="light blue")
+    })
+    
+    #output$resale_box <- renderPlotly({
+      #sf_resale_flat <- processed_table()
+      #ggplot(sf_resale_flat, aes(x = flat_type, y = resale_price)) + geom_boxplot() + facet_grid(town ~ .)
+    #})
     
     
     output$mrt_box <- renderPlotly({
