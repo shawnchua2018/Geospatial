@@ -440,16 +440,24 @@ body <- dashboardBody(tabItems(
                                                 checkboxInput(inputId = "mall_incl", label = "Shopping Mall", value= FALSE))),
                       tabPanel("Fixed Bandwidth", icon = icon("ruler"),
                                tabsetPanel(tabPanel("GWR Map", icon= icon("map"),
-                                                    actionButton("plot", "Plot map"),
-                                                    conditionalPanel(condition = "input.plot == true",
-                                                                     #condition = "input.fix == true",
-                                                                     plotOutput("fixed_plot"))), 
-                                                                     #tmapOutput("fixed_plot1"))),
+                                                    #actionButton("plot", "Plot map"),
+                                                    conditionalPanel(condition = "input.fix == false",
+                                                    p("Please check the Fixed Bandwidth option to see plot on this page")),
+                                                    
+                                                    conditionalPanel(#condition = "input.plot == true",
+                                                                     condition = "input.fix == true",
+                                                                     p("Plot takes a moment to load"),
+                                                                     #plotOutput("fixed_plot"))), 
+                                                                     tmapOutput("fixed_plot1"))),
                                            tabPanel("GWR Data Output", icon= icon("file-excel")))), 
                       tabPanel("Adaptive Bandwidth",icon = icon("ruler"),
                                tabsetPanel(tabPanel("GWR Map", icon= icon("map"),
+                                                    conditionalPanel(condition = "input.kadapt == false",
+                                                                     p("Please check the Adaptive Bandwidth option to see plot on this page")),
                                                     conditionalPanel(condition = "input.kadapt == true",
-                                                                     plotOutput("adapt_plot"))), 
+                                                                     p("Plot takes a moment to load"),
+                                                                     #plotOutput("adapt_plot"))),
+                                                                     tmapOutput("adapt_plot1"))),
                                            tabPanel("GWR Data Output", icon = icon("file-excel"))))
                                
                                
@@ -796,19 +804,28 @@ server <- function(input, output) {
         tm_view(set.zoom.limits = c(11,14))
     })
 
-      #output$fixed_plot1 <- renderTmap({
-        #tm_shape(sf_mpsz2019)+
-          #tm_fill()+
-          #tm_borders(lwd = 1, alpha = 1) +
-          #tm_shape(plot_fix()) +  
-          #tm_dots(col = "Local_R2",
-                  #border.col = "gray60",
-                  #border.lwd = 1) +
-          #tm_view(set.zoom.limits = c(11,14))
-    #})
+      output$fixed_plot1 <- renderTmap({
+        tm_shape(sf_mpsz2019)+
+          tm_fill()+
+          tm_borders(lwd = 1, alpha = 1) +
+          tm_shape(plot_fix()) +  
+          tm_dots(col = "Local_R2",
+                  border.col = "gray60",
+                  border.lwd = 1) +
+          tm_view(set.zoom.limits = c(11,14))
+    })
 
 
-
+      output$adapt_plot1 <- renderTmap({
+        tm_shape(sf_mpsz2019)+
+          tm_fill()+
+          tm_borders(lwd = 1, alpha = 1) +
+          tm_shape(plot_adapt()) +  
+          tm_dots(col = "Local_R2",
+                  border.col = "gray60",
+                  border.lwd = 1) +
+          tm_view(set.zoom.limits = c(11,14))
+      })
 
     
     output$fixed_plot <- renderPlot({
