@@ -4,7 +4,7 @@ library(shinydashboard)
 library(shinyWidgets)
 library(DT)
 
-packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster','plotly', 'leaflet')
+packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster','plotly', 'leaflet', 'tmaptools', 'spData')
 for (p in packages){
   if(!require(p, character.only = T)){
     install.packages(p)
@@ -390,7 +390,14 @@ body <- dashboardBody(tabItems(
                                conditionalPanel(condition = "input.hawker == true",
                                plotlyOutput("hawker_box")),
                                conditionalPanel(condition = "input.mall == true",
-                               plotlyOutput("mall_box"))))))), 
+                               plotlyOutput("mall_box"))),
+                               
+                               tabPanel("Spatial Autocorrelation", "Spatial Autocorrelation",
+                               #plotlyOutput("resplot", width = "1400px", height = "1400px")),
+                               plotOutput("res_plot"))
+                               
+                               )))), 
+          
   tabItem(tabName="GWR", 
           tabsetPanel(tabPanel("Settings", icon = icon("cogs"),
                                h3("Bandwidth Selection"),
@@ -432,9 +439,12 @@ body <- dashboardBody(tabItems(
                                conditionalPanel(condition = "input.mall == true",
                                                 checkboxInput(inputId = "mall_incl", label = "Shopping Mall", value= FALSE))),
                       tabPanel("Fixed Bandwidth", icon = icon("ruler"),
-                               tabsetPanel(tabPanel("GWR Map", icon= icon("map"), 
-                                                    conditionalPanel(condition = "input.fix == true",
+                               tabsetPanel(tabPanel("GWR Map", icon= icon("map"),
+                                                    actionButton("plot", "Plot map"),
+                                                    conditionalPanel(condition = "input.plot == true",
+                                                                     #condition = "input.fix == true",
                                                                      plotOutput("fixed_plot"))), 
+                                                                     #tmapOutput("fixed_plot1"))),
                                            tabPanel("GWR Data Output", icon= icon("file-excel")))), 
                       tabPanel("Adaptive Bandwidth",icon = icon("ruler"),
                                tabsetPanel(tabPanel("GWR Map", icon= icon("map"),
@@ -599,7 +609,7 @@ server <- function(input, output) {
       sf_resale_flat.res <- sf_resale_flat.res%>%mutate(flat_type_code = as.numeric(flat_type_code))
       sf_resale_flat.res <- sf_resale_flat.res%>%mutate(resale_price = as.numeric(resale_price))
       })
-    
+
     output$testTab <-DT::renderDataTable({
       DT::datatable(data = fixing()@data,
                     extensions = c("FixedColumns", "FixedHeader", "Scroller"), 
@@ -785,6 +795,21 @@ server <- function(input, output) {
                 style="quantile") +
         tm_view(set.zoom.limits = c(11,14))
     })
+
+      #output$fixed_plot1 <- renderTmap({
+        #tm_shape(sf_mpsz2019)+
+          #tm_fill()+
+          #tm_borders(lwd = 1, alpha = 1) +
+          #tm_shape(plot_fix()) +  
+          #tm_dots(col = "Local_R2",
+                  #border.col = "gray60",
+                  #border.lwd = 1) +
+          #tm_view(set.zoom.limits = c(11,14))
+    #})
+
+
+
+
     
     output$fixed_plot <- renderPlot({
       tm_shape(sf_mpsz2019)+
@@ -807,7 +832,16 @@ server <- function(input, output) {
                 border.lwd = 1) +
         tm_view(set.zoom.limits = c(11,14))
     })
-   
+    
+    output$resplot <- renderPlot({
+      tm_shape(sf_mpsz2019)+
+        tm_polygons(alpha = 0.4) +
+        tm_shape(restable()) +  
+        tm_dots(col = "MLR_RES",
+                alpha = 0.6,
+                style="quantile") +
+        tm_view(set.zoom.limits = c(11,14))
+    })
     
     sliderValues <- reactive({
       data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Hawkers", "Shopping Malls"), 
