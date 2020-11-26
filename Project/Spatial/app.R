@@ -319,13 +319,15 @@ body <- dashboardBody(tabItems(
 
                       tabPanel("View Data", icon = icon("database"), 
                                h3("Select variables to view in the HDB Resale Data"), 
-                               div(selectInput("month", "Month", choices=c("2020-01", "2020-02", "2020-03" , "2020-04", "2020-05", "2020-06",
-                                                                           "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12")), 
-                                   style="display:inline-block"),
-                               div(selectInput("flat", "Flat Type", choices=c("1 ROOM", "2 ROOM", "3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE", "MULTI-GENERATION" )), 
+                               #div(selectInput("month", "Month", choices=c("All", "2020-01", "2020-02", "2020-03" , "2020-04", "2020-05", "2020-06",
+                                                                           #"2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12")), 
+                                   #style="display:inline-block"),
+                               div(selectInput("town", "Town", choices = c("All", sf_resale_flat$town))),
+                               div(selectInput("flat", "Flat Type", choices=c("All", "1 ROOM", "2 ROOM", "3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE", "MULTI-GENERATION" )), 
                                    style="display:inline-block"),
                                div(selectInput("sample", "Sample Size", choices = c("100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"))),
                                p(strong("Note: The larger the sample size, the longer it takes for the GWR model to run")),
+                               p(strong("If error message appears, filter is too specific resulting in too little data for analysis, please filter by only town or flat type at a single time.", style='color:red')),
                                br(),
                                
                                DT::dataTableOutput(outputId = "popTab"), 
@@ -354,18 +356,25 @@ body <- dashboardBody(tabItems(
   tabItem(tabName="GWR", 
           tabsetPanel(tabPanel("Settings", icon = icon("cogs"),
                                h3("Bandwidth Selection"),
-                               materialSwitch(inputId = "auto", label = strong("Auto Bandwidth"), status = "danger"),
-                               numericInput("bandwidth", "Input Bandwidth: ", 10,
-                                            min = NA,
-                                            max = NA,
-                                            step = NA,
-                                            width = NULL), 
+                               materialSwitch(inputId = "fix", label = strong("Fixed Bandwidth"), status = "danger"),
+                               #checkboxInput(inputId = "auto", label = "Auto Fixed Bandwidth", value= FALSE),
+                               conditionalPanel(condition = "input.fix == true",
+                                checkboxInput(inputId = "auto", label = "Auto Fixed Bandwidth", value= FALSE),
+                                 conditionalPanel(condition = "input.auto == false",
+                                   numericInput("bandwidth", "Manual Input Fixed Bandwidth: ", 1000,
+                                                min = NA,
+                                                max = NA,
+                                                step = NA,
+                                                width = NULL))),
+                               #checkboxInput(inputId = "kadapt", label = "Adaptive Bandwidth", value= FALSE),
+                               materialSwitch(inputId = "kadapt", label = strong("Adaptive Bandwidth"), status = "danger"), 
                                h3("Kernel Selection"), 
-                               materialSwitch(inputId = "kauto", label = strong("Adaptive Kernel"), status = "danger"), 
                                selectInput(inputId = "kernel", label = "Select Kernel type: ", 
                                            choices = c("Gaussian", "Exponential", "Bi-square", "Tricube", "Boxcar")), 
                                br(),
                                h3("Independant Variables"), 
+                               checkboxInput(inputId = "floor_incl", label = "Floor_area_sqm", value= FALSE),
+                               checkboxInput(inputId = "flat_incl", label = "Flat Type", value= FALSE),
                                conditionalPanel(condition = "input.mrt == true",
                                                 checkboxInput(inputId = "mrt_incl", label = "MRT", value= FALSE)),
                                conditionalPanel(condition = "input.pschool == true",
@@ -385,10 +394,14 @@ body <- dashboardBody(tabItems(
                                conditionalPanel(condition = "input.mall == true",
                                                 checkboxInput(inputId = "mall_incl", label = "Shopping Mall", value= FALSE))),
                       tabPanel("Fixed Bandwidth", icon = icon("ruler"),
-                               tabsetPanel(tabPanel("GWR Map", icon= icon("map"), plotOutput("fixed_plot")), 
+                               tabsetPanel(tabPanel("GWR Map", icon= icon("map"), 
+                                                    conditionalPanel(condition = "input.fix == true",
+                                                                     plotOutput("fixed_plot"))), 
                                            tabPanel("GWR Data Output", icon= icon("file-excel")))), 
                       tabPanel("Adaptive Bandwidth",icon = icon("ruler"),
-                               tabsetPanel(tabPanel("GWR Map", icon= icon("map"),DT::dataTableOutput(outputId = "testTab")), 
+                               tabsetPanel(tabPanel("GWR Map", icon= icon("map"),
+                                                    conditionalPanel(condition = "input.kadapt == true",
+                                                                     plotOutput("adapt_plot"))), 
                                            tabPanel("GWR Data Output", icon = icon("file-excel"))))
                                
                                
@@ -402,25 +415,13 @@ server <- function(input, output) {
     set.seed(0)
     histdata <- rnorm(500)
     
-
-    #sample_resale_flat <- reactive({
-      #testtest <- as_Spatial(sf_resale_flat)
-      #testtest <- testtest[sample(1:length(testtest),input$sample),]
-      #sample_resale_flat <- st_as_sf(testtest)
-    #})
-    
-    output$new_resale_flat <- renderTable({
-      new_resale_flat()
-    })
-    
-    
-    output$new_resale_flat_plot <- renderPlot({
-    
-      plot(new_resale_flat()$ds, new_resale_flat()$y)
-  
-    })
-    
    processed_table <- reactive({
+       if (input$flat !="All") {
+         sf_resale_flat <- sf_resale_flat %>% filter(flat_type == input$flat)
+       }
+       if (input$town !="All") {
+         sf_resale_flat <- sf_resale_flat %>% filter(town == input$town)
+       }
       testtest <- as_Spatial(sf_resale_flat)
       testtest <- testtest[sample(1:length(testtest),input$sample),]
       sf_resale_flat <- st_as_sf(testtest)
@@ -460,6 +461,7 @@ server <- function(input, output) {
         buffer_mall <- st_buffer(sf_resale_flat, input$mallWidth)
         sf_resale_flat <- sf_resale_flat %>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall)))
       }
+
         #buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
         #buffer_psch <- st_buffer(sf_resale_flat, input$pschoolWidth)
         #buffer_ssch <- st_buffer(sf_resale_flat, input$sschoolWidth)
@@ -574,13 +576,27 @@ server <- function(input, output) {
     fixing <- reactive({
       sf_resale_flat <- restable()
       sp_resale_flat <- as_Spatial(sf_resale_flat)
-      drop <- c("month", "town", "block", "street_name", "Address", "floor_area_sqm", "flat_type", "storey_range", "remaining_lease", "remaining_lease_nearest_year")
+      drop <- c("month", "town", "block", "street_name", "Address", "flat_type", "storey_range", "remaining_lease", "remaining_lease_nearest_year")
       sp_resale_flat <- sp_resale_flat[,!(names(sp_resale_flat@data) %in% drop)]
       sp_resale_flat@data <- sp_resale_flat@data %>% mutate(resale_price = as.numeric(resale_price))
       sp_resale_flat@data <- sp_resale_flat@data %>% mutate(flat_type_code = as.numeric(flat_type_code))
+      sp_resale_flat@data <- sp_resale_flat@data %>% mutate(floor_area_sqm = as.numeric(floor_area_sqm))
       sp_resale_flat
     })
     
+    kernel_check <- reactive({
+      if (input$kernel == "Gaussian"){
+        kernel <- "gaussian"
+      } else if (input$kernel == "Exponential"){
+        kernel <- "exponential"
+      } else if (input$kernel == "Bi-square"){
+        kernel <- "bisquare"
+      } else if (input$kernel == "Tricube"){
+        kernel <- "tricube"
+      } else if (input$kernel == "Boxcar"){
+        kernel <- "boxcar"
+      } 
+    })
     
     GWR_fixed <- reactive({
       sp_resale_flat <- fixing()
@@ -621,26 +637,97 @@ server <- function(input, output) {
         newelem <- 'mall_count'
         mylist <- c(mylist, newelem)
       }
+      if (input$floor_incl=="TRUE") {
+        newelem <- 'floor_area_sqm'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$flat_incl=="TRUE") {
+        newelem <- 'flat_type_code'
+        mylist <- c(mylist, newelem)
+      }
+      
+      kernel = kernel_check()
       GwrFormula <- as.formula(paste('resale_price',paste(mylist, collapse="+"), sep="~"))
-      #bw.fixed <- bw.gwr(formula=as.numeric(resale_price)~as.numeric(flat_type_code)+mrt_count+pri_school_count+sec_school_count+community_center_count+supermarket_count+preschool_count+hawker_count+mall_count, data=sp_resale_flat, approach="CV", kernel="gaussian", adaptive=FALSE, longlat=FALSE)
-      bw.fixed <- bw.gwr(formula=GwrFormula, data=sp_resale_flat, approach="CV", kernel="gaussian", adaptive=FALSE, longlat=FALSE)
-      #bw.fixed
+      bw.fixed <- bw.gwr(formula=GwrFormula, data=sp_resale_flat, approach="CV", kernel=kernel, adaptive=FALSE, longlat=FALSE)
       set.seed(0)
-      gwr.fixed <- gwr.basic(formula=GwrFormula, data=sp_resale_flat, bw=4000, kernel = 'gaussian', longlat = FALSE)
-      #gwr.fixed <- gwr.basic(formula=flat_type_code+resale_price~mrt_count+pri_school_count+sec_school_count+community_center_count+supermarket_count+preschool_count+hawker_count+mall_count, data=sp_resale_flat, bw=4000, kernel = 'gaussian', longlat = FALSE)
-      #gwr.fixed
-      #bw.adaptive <- bw.gwr(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data=sp_resale_flat, approach="CV", kernel="gaussian", adaptive=TRUE, longlat=FALSE)
-      #gwr.adaptive <- gwr.basic(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data=sp_resale_flat, bw=bw.adaptive, kernel = 'gaussian', adaptive=TRUE, longlat = FALSE)
+      if (input$auto == "TRUE"){
+        gwr.fixed <- gwr.basic(formula=GwrFormula, data=sp_resale_flat, bw=bw.fixed, kernel = kernel, longlat = FALSE)
+      } 
+      else {
+        gwr.fixed <- gwr.basic(formula=GwrFormula, data=sp_resale_flat, bw=input$bandwidth, kernel = kernel, longlat = FALSE)
+      }
       })
     
+    GWR_adapt <- reactive({
+      sp_resale_flat <- fixing()
+      mylist <- c()
+      if (input$mrt_incl==TRUE) {
+        newelem <- 'mrt_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$pschool_incl=="TRUE") {
+        newelem <- 'pri_school_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$sschool_incl=="TRUE") {
+        newelem <- 'sec_school_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$cc_incl=="TRUE") {
+        newelem <- 'community_center_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$supermarket_incl=="TRUE") {
+        newelem <- 'supermarket_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$sport_incl=="TRUE") {
+        newelem <- 'sport_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$preschool_incl=="TRUE") {
+        newelem <- 'preschool_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$hawker_incl=="TRUE") {
+        newelem <- 'hawker_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$mall_incl=="TRUE") {
+        newelem <- 'mall_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$floor_incl=="TRUE") {
+        newelem <- 'floor_area_sqm'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$flat_incl=="TRUE") {
+        newelem <- 'flat_type_code'
+        mylist <- c(mylist, newelem)
+      }
+      kernel = kernel_check()
+      GwrFormula <- as.formula(paste('resale_price',paste(mylist, collapse="+"), sep="~"))
+      bw.adaptive <- bw.gwr(formula=GwrFormula, data=sp_resale_flat, approach="CV", kernel=kernel, adaptive=TRUE, longlat=FALSE)
+      set.seed(0)
+      gwr.adaptive <- gwr.basic(formula = GwrFormula, data=sp_resale_flat, bw=bw.adaptive, kernel = kernel, adaptive=TRUE, longlat = FALSE)
+    })
     
-    plot_prep <- reactive({
+    
+    plot_fix <- reactive({
       gwr.fixed <- GWR_fixed()
       resale.sf.fixed <- st_as_sf(gwr.fixed$SDF)%>%st_transform(crs=3414)
       resale.sf.fixed.svy21 <- st_transform(resale.sf.fixed, 3414)
       gwr.fixed.output <- as.data.frame(gwr.fixed$SDF)
       resale.sf.fixed <- cbind(restable(), as.matrix(gwr.fixed.output))
       })
+    
+    plot_adapt <- reactive({
+      gwr.adapt <- GWR_adapt()
+      resale.sf.fixed <- st_as_sf(gwr.adapt$SDF)%>%st_transform(crs=3414)
+      resale.sf.fixed.svy21 <- st_transform(resale.sf.fixed, 3414)
+      gwr.adapt.output <- as.data.frame(gwr.adapt$SDF)
+      resale.sf.fixed <- cbind(restable(), as.matrix(gwr.adapt.output))
+    })
     
     output$res_plot <- renderPlot({
       tm_shape(sf_mpsz2019)+
@@ -657,16 +744,23 @@ server <- function(input, output) {
       tm_shape(sf_mpsz2019)+
         tm_fill()+
         tm_borders(lwd = 1, alpha = 1) +
-        tm_shape(plot_prep()) +  
+        tm_shape(plot_fix()) +  
         tm_dots(col = "Local_R2",
                 border.col = "gray60",
                 border.lwd = 1) +
         tm_view(set.zoom.limits = c(11,14))
     })
-  
-
-
- 
+    
+    output$adapt_plot <- renderPlot({
+      tm_shape(sf_mpsz2019)+
+        tm_fill()+
+        tm_borders(lwd = 1, alpha = 1) +
+        tm_shape(plot_adapt()) +  
+        tm_dots(col = "Local_R2",
+                border.col = "gray60",
+                border.lwd = 1) +
+        tm_view(set.zoom.limits = c(11,14))
+    })
    
     
     sliderValues <- reactive({
@@ -685,78 +779,65 @@ server <- function(input, output) {
     
     
     output$mrt_box <- renderPlotly({
-      sf_resale_flat <- restable()
+      sf_resale_flat <- processed_table()
       buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
-      
       sf_resale_flat <- sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_mrt, sf_mrt)))
-      
       ggplot(sf_resale_flat, aes(x = input$choice , y = mrt_count)) + geom_boxplot()
     })
     
     output$pschool_box <- renderPlotly({
-      sf_resale_flat <- restable()
+      sf_resale_flat <- processed_table()
       buffer_psch <- st_buffer(sf_resale_flat, input$pschoolWidth)
-      
       sf_resale_flat <- sf_resale_flat %>% mutate(pri_school_count = lengths(st_intersects(buffer_psch, sf_pschool)))
-      
       ggplot(sf_resale_flat, aes(x = input$choice , y = pri_school_count)) + geom_boxplot()
     })
 
     output$sschool_box <- renderPlotly({
-      sf_resale_flat <- restable()
+      sf_resale_flat <- processed_table()
       buffer_ssch <- st_buffer(sf_resale_flat, input$sschoolWidth)
-      
       sf_resale_flat <- sf_resale_flat %>% mutate(sec_school_count = lengths(st_intersects(buffer_ssch, sf_sschool)))
-      
       ggplot(sf_resale_flat, aes(x = input$choice , y = sec_school_count)) + geom_boxplot()
     })
   
     output$cc_box <- renderPlotly({
-      sf_resale_flat <- restable()
+      sf_resale_flat <- processed_table()
       buffer_cc <- st_buffer(sf_resale_flat, input$ccWidth)
-      
       sf_resale_flat <- sf_resale_flat %>% mutate(community_center_count = lengths(st_intersects(buffer_cc, sf_cc)))
-      
       ggplot(sf_resale_flat, aes(x = input$choice , y = community_center_count)) + geom_boxplot()
     })
   
     output$supermarket_box <- renderPlotly({
-      sf_resale_flat <- restable()
+      sf_resale_flat <- processed_table()
       buffer_supermarket <- st_buffer(sf_resale_flat, input$supermarketWidth)
       sf_resale_flat <- sf_resale_flat %>% mutate(supermarket_count = lengths(st_intersects(buffer_supermarket, sf_supermarket)))
-      
       ggplot(sf_resale_flat, aes(x = input$choice , y = supermarket_count)) + geom_boxplot()
     })
     
     output$sport_box <- renderPlotly({
-      sf_resale_flat <- restable()
+      sf_resale_flat <- processed_table()
       buffer_sport <- st_buffer(sf_resale_flat, input$sportWidth)
       sf_resale_flat <- sf_resale_flat %>% mutate(sport_count = lengths(st_intersects(buffer_sport, sf_sport_facilities)))
-      
       ggplot(sf_resale_flat, aes(x = input$choice , y = sport_count)) + geom_boxplot()
     })
     
     output$preschool_box <- renderPlotly({
-      sf_resale_flat <- restable()
+      sf_resale_flat <- processed_table()
       buffer_preschool <- st_buffer(sf_resale_flat, input$preschoolWidth)
       sf_resale_flat <- sf_resale_flat %>% mutate(preschool_count = lengths(st_intersects(buffer_preschool, sf_preschool)))
-      
       ggplot(sf_resale_flat, aes(x = input$choice , y = preschool_count)) + geom_boxplot()
     })
     
     output$hawker_box <- renderPlotly({
-      sf_resale_flat <- restable()
+      sf_resale_flat <- processed_table()
       buffer_hawker <- st_buffer(sf_resale_flat, input$hawkerWidth)
       sf_resale_flat <- sf_resale_flat %>% mutate(hawker_count = lengths(st_intersects(buffer_hawker, sf_hawkercenter)))
-      
       ggplot(sf_resale_flat, aes(x = input$choice , y = hawker_count)) + geom_boxplot()
     })
     
     output$mall_box <- renderPlotly({
-      sf_resale_flat <- restable()
+      sf_resale_flat <- processed_table()
       buffer_mall <- st_buffer(sf_resale_flat, input$mallWidth)
       sf_resale_flat <- sf_resale_flat %>% mutate(mall_count = lengths(st_intersects(buffer_mall, sf_mall)))
- 
       ggplot(sf_resale_flat, aes(x = input$choice , y = mall_count)) + geom_boxplot()
     })
 } 
