@@ -368,13 +368,10 @@ body <- dashboardBody(tabItems(
                                                                                                            p("Histogram of Shopping Mall Count"),
                                                                                                            plotlyOutput("mall_hist"))), 
                                tabPanel("Boxplot", "Boxplot of Table Data",
-                                        conditionalPanel(condition = "input.town == ALL",
-                                                         selectInput("town2", "Please select town filter only if filter in precious tab for Town is All", choices = c("All", sf_resale_flat$town))),
-                                        plotlyOutput("resale_box", width = "1400px", height = "1400px")),
-                                        #plotlyOutput("floorarea_box", width = "1400px", height = "1400px"),
-                                        #plotlyOutput("flattype_box", width = "1400px", height = "1400px")),
-                                        #plotlyOutput("floorarea_box"),
-                                        #plotlyOutput("flattype_box")),
+                               conditionalPanel(condition = "input.town == 'All'",
+                                                selectInput("town2", "Please use this filter only if filter in previous tab for Town is All", choices = c("All", sf_resale_flat$town))),
+                               plotlyOutput("resale_box", width = "1400px", height = "1400px")),
+        
                                tabPanel("Boxplot For Selected Features", "Boxplot of Selected Features",
                                conditionalPanel(condition = "input.mrt == true",
                                plotlyOutput("mrt_box")),
@@ -585,6 +582,14 @@ server <- function(input, output) {
       }
       if (input$mall=="TRUE") {
         newelem <- 'mall_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$floor_incl=="TRUE") {
+        newelem <- 'floor_area_sqm'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$flat_incl=="TRUE") {
+        newelem <- 'flat_type_code'
         mylist <- c(mylist, newelem)
       }
       GwrFormula <- as.formula(paste('resale_price',paste(mylist, collapse="+"), sep="~"))
