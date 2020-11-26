@@ -368,9 +368,14 @@ body <- dashboardBody(tabItems(
                                                                                                            p("Histogram of Shopping Mall Count"),
                                                                                                            plotlyOutput("mall_hist"))), 
                                tabPanel("Boxplot", "Boxplot of Table Data",
-                                        plotlyOutput("resale_box"),
-                                        plotlyOutput("floorarea_box"), 
-                                        plotlyOutput("flattype_box"),
+                                        conditionalPanel(condition = "input.town == ALL",
+                                                         selectInput("town2", "Please select town filter only if filter in precious tab for Town is All", choices = c("All", sf_resale_flat$town))),
+                                        plotlyOutput("resale_box", width = "1400px", height = "1400px")),
+                                        #plotlyOutput("floorarea_box", width = "1400px", height = "1400px"),
+                                        #plotlyOutput("flattype_box", width = "1400px", height = "1400px")),
+                                        #plotlyOutput("floorarea_box"),
+                                        #plotlyOutput("flattype_box")),
+                               tabPanel("Boxplot For Selected Features", "Boxplot of Selected Features",
                                conditionalPanel(condition = "input.mrt == true",
                                plotlyOutput("mrt_box")),
                                conditionalPanel("input.pschool == true",
@@ -812,7 +817,6 @@ server <- function(input, output) {
       })
  
     
-    
     output$resale <- renderPlotly({
       sf_resale_flat <- processed_table()
       ggplot(data= sf_resale_flat, aes(x=as.numeric(`resale_price`))) +geom_histogram(bins=20, color="black", fill="light blue")
@@ -876,7 +880,28 @@ server <- function(input, output) {
     
     #output$resale_box <- renderPlotly({
       #sf_resale_flat <- processed_table()
-      #ggplot(sf_resale_flat, aes(x = flat_type, y = resale_price)) + geom_boxplot() + facet_grid(town ~ .)
+      #ggplot(sf_resale_flat, aes(x = flat_type, y = resale_price)) + geom_boxplot()
+    #})
+    
+    output$resale_box <- renderPlotly({
+      sf_resale_flat <- processed_table()
+      if(input$town == "All"){
+        if(input$town2 != "All"){
+          sf_resale_flat <- sf_resale_flat%>%filter(town == input$town2)
+        }
+        ggplot(sf_resale_flat, aes(x = flat_type, y = resale_price)) + geom_boxplot()
+      }
+      else{
+        ggplot(sf_resale_flat, aes(x = flat_type, y = resale_price)) + geom_boxplot()
+      }
+    })
+    
+    #output$resale_box2 <- renderPlotly({
+      #sf_resale_flat <- processed_table()
+      #if(input$town == "All"){
+        #sf_resale_flat <- sf_resale_flat%>%filter(town == input$town2)
+        #ggplot(sf_resale_flat, aes(x = flat_type, y = resale_price)) + geom_boxplot()
+      #}
     #})
     
     
