@@ -8,19 +8,22 @@ author:
     email: "shawn.chua.2018@sis.smu.edu.sg"
     affiliation: |
       | School of Information Systems
-    address: "Singapore Management University (SMU)"
+      | Singapore Management University (SMU)
   - name: Olivia GOO Yu Ya
     email: "olivia.goo.2018@socsc.smu.edu.sg"
     affiliation: |
-      |School Of Social Sciences
-    address: "Singapore Management University (SMU)"
-    
+      | School Of Social Sciences
+      | Singapore Management University (SMU)
+
+keywords: [Geographically Weighted Regression, Geospatial Analytics, Singapore HDB Resale Prices]
+
 abstract: |
   Valuing housing prices has seen a surge in popularity over the years amongst policy planners and economist due to the significant impact that properties have on the economy and society. The current hedonic pricing models used in the market fails to take into account the effect of local spatial features on the housing prices which however there has been increasing interest and studies carried out on Geographically Weighted Regression (GWR) model, a more precise regression model to stimulate the spatial distribution of housing prices. There are several GWR models available which poses a challenge to casual users who would like to conduct a simple and understandable analysis of the spatial distribution of housing prices. Therefore to address this issue, we developed $patial, an interactive and accessible application with an user friendly interface to aid economists and policy planners to effortlessly explore how variations of spatial features such as number of shopping malls surrounding the housing estate in different locations affects the price of the housing flats.
 
 bibliography: sigproc.bib
 csl: acm-sig-proceedings.csl
-output: rticles::acm_article 
+output: rticles::acm_article
+
 ---
 
 
@@ -50,7 +53,7 @@ The 2 main types of data used in our application is: \
 2.	Data on features provided to user which is used as independent variables in the GWR model \
 
 The fixed spatial features provided by $patial are: \
-1.	Locations of MRT stations \
+(hr /> 1.	Locations of MRT stations \
 2.	Primary School Locations \
 3.	Secondary School Locations\
 4.	Community Centre Locations \
@@ -77,7 +80,14 @@ After ensuring that all datasets contain coordinate data. We have to convert tho
 The following section reveals the techniques and algorithms used in the process of designing the application. 
 
 ## Application Architecture 
+![Application Architecture](App Archite.png)
+
 The application was developed using Shiny, an R program package. R shiny is a simple package that is used to build interactive web applications and dashboards. It runs on a Shiny server hosted by Shinyapps.io , the datasets mentioned in Section 3.1 are imported and stored in the server. At the backend, the CSV and Shapefile datasets are cleaned and used for geocoding, projection and GWR. Whenever the application runs the datasets are automatically loaded for use. The interactive maps featured in the application calls on the Leaflet package for it to be displayed. 
+
+## Application Overview
+### R Packages
+The following R Packages are used in the
+development of the EzModel Application: 
 
 
 
