@@ -4,7 +4,7 @@ library(shinydashboard)
 library(shinyWidgets)
 library(DT)
 
-packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster','plotly', 'leaflet', 'tmaptools', 'spData')
+packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster','plotly', 'leaflet', 'tmaptools', 'shinyBS')
 for (p in packages){
   if(!require(p, character.only = T)){
     install.packages(p)
@@ -265,67 +265,67 @@ body <- dashboardBody(tabItems(
           p("This application seeks to allow users to visualise the effects of spatial autocorrelation between 
                     attributes used in determining resale price of flats"), 
           h3("Using the Application"), 
-          p("Our application allows users to select the spatial features they would like to experiment with")),
+          p("Our application allows users to select the spatial features they would like to explore and experiment with to see whether these spatial features have an effect on the resale price of flats. If effects are present, we can also see how much impact do these features have on resale prices.")),
   tabItem(tabName = "settings",
           tabsetPanel(tabPanel("Feature Selection", icon = icon("check-square"), 
                                h3("Radius Selection"),
-                               p("This page allows you to select your desired radius to view the number of features within the proximity selected"),
+                               p("This page allows you to select your desired radius to view the number of features within the proximity selected (Slider scale is in meters)"),
                                checkboxInput(inputId = "mrt", label = "MRT", value= FALSE), 
                                conditionalPanel(condition = "input.mrt == true",
                                                 sliderInput(inputId = 'mrtWidth', label = "MRT (includes all MRT stations in Singapore)",
-                                                            min = 0, 
+                                                            min = 100, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5)),
+                                                            value = c(500), step = 10)),
                               
                                checkboxInput(inputId = "pschool", label = "Primary Schools", value= FALSE), 
                                conditionalPanel(condition = "input.pschool == true",
                                                 sliderInput(inputId = 'pschoolWidth', label = "Primary Schools (includes all primary schools in Singapore)",
-                                                            min = 0, 
+                                                            min = 100, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5)),
+                                                            value = c(500), step = 10)),
                                checkboxInput(inputId = "sschool", label = "Secondary Schools", value= FALSE), 
                                conditionalPanel(condition = "input.sschool == true",
                                                 sliderInput(inputId = 'sschoolWidth', label = "Secondary Schools (includes all secondary schools in Singapore)",
-                                                            min = 0, 
+                                                            min = 100, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5)),
+                                                            value = c(500), step = 10)),
                                checkboxInput(inputId = "cc", label = "Community Centers", value= FALSE), 
                                conditionalPanel(condition = "input.cc == true",
                                                 sliderInput(inputId = 'ccWidth', label = "Community Centers (includes all community centers in Singapore)",
-                                                            min = 0, 
+                                                            min = 100, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5)),
+                                                            value = c(500), step = 10)),
                                checkboxInput(inputId = "supermarket", label = "Supermarkets ", value= FALSE), 
                                conditionalPanel(condition = "input.supermarket == true",
                                                 sliderInput(inputId = 'supermarketWidth', label = "Supermarkets (includes all licensed supermarkets in Singapore)",
-                                                            min = 0, 
+                                                            min = 100, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5)),
+                                                            value = c(500), step = 10)),
                                checkboxInput(inputId = "sport", label = "Sports Facilities", value= FALSE), 
                                conditionalPanel(condition = "input.sport == true",
                                                 sliderInput(inputId = 'sportWidth', label = "Sports (includes all sports facilities managed by Sport-SG)",
-                                                            min = 0, 
+                                                            min = 300, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5)),
+                                                            value = c(500), step = 10)),
                                checkboxInput(inputId = "preschool", label = "Preschools", value= FALSE), 
                                conditionalPanel(condition = "input.preschool == true",
                                                 sliderInput(inputId = 'preschoolWidth', label = "Preschools (includes both kindergarten and childcare centers)",
-                                                            min = 0, 
+                                                            min = 100, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5)),
+                                                            value = c(500), step = 10)),
                               
                                checkboxInput(inputId = "hawker", label = "Hawkers", value= FALSE), 
                                conditionalPanel(condition = "input.hawker == true",
                                                 sliderInput(inputId = 'hawkerWidth', label = "Hawkers (includes all hawker centers in Singapore)",
-                                                            min = 0, 
+                                                            min = 200, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5)),
+                                                            value = c(0), step = 10)),
                                checkboxInput(inputId = "mall", label = "Shopping Malls", value= FALSE), 
                                conditionalPanel(condition = "input.mall == true",
                                                 sliderInput(inputId = 'mallWidth', label = "Shopping Malls (includes all shopping malls in Singapore)",
-                                                            min = 0, 
+                                                            min = 200, 
                                                             max = 1000, 
-                                                            value = c(0), step = 5))),
+                                                            value = c(0), step = 10))),
 
                       tabPanel("View Data", icon = icon("database"), 
                                h3("Select variables to view in the HDB Resale Data"), 
@@ -418,6 +418,9 @@ body <- dashboardBody(tabItems(
           
   tabItem(tabName="GWR", 
           tabsetPanel(tabPanel("Settings", icon = icon("cogs"),
+                               p("Below is the Correlation Plot to assist in picking independent variables for further analysis", style = "font-size:30px;"),
+                               p("Note: If radius in feature selection is too small and counts of feature are 0, error in correlation plot may occur, hence please modify radius input in the feature selection tab accordingly.", style = "font-size:20px;color:red"),
+                               verbatimTextOutput("corr"),
                                h3("GWR formula: y = b0 + b1x1 + e (where y is the dependent variable, x1 is the independent variable, b0 and b1, are the parameters to be estimated, and e is a random error term)"),
                                h3("Fixed Dependent Variable(y): Resale Price"), 
                                h3("Please pick at least 1 Independant Variable (x) below to formulate GWR formula"), 
@@ -443,6 +446,16 @@ body <- dashboardBody(tabItems(
                                                 checkboxInput(inputId = "mall_incl", label = "Shopping Mall", value= FALSE)),
                                br(),
                                
+                               
+                               #plotOutput("corr"),
+                               #actionButton("plot", "Correlation Plot"),
+                               #conditionalPanel(condition = "input.plot == true",
+                                                #verbatimTextOutput("corr")),
+                               
+                               #bsModal("modalExample", "Your plot", "go", size = "large",plotOutput("corr")),
+                               
+                               #actionButton("go", "Go"),
+                               
                                h3("Bandwidth Selection for GWR modelling"),
                                materialSwitch(inputId = "fix", label = strong("Fixed Bandwidth"), status = "danger"),
                                #checkboxInput(inputId = "auto", label = "Auto Fixed Bandwidth", value= FALSE),
@@ -452,7 +465,7 @@ body <- dashboardBody(tabItems(
                                                                  numericInput("bandwidth", "Manual Input Fixed Bandwidth: ", 1000,
                                                                               min = NA,
                                                                               max = NA,
-                                                                              step = NA,
+                                                                              step = 100,
                                                                               width = NULL))),
                                #checkboxInput(inputId = "kadapt", label = "Adaptive Bandwidth", value= FALSE),
                                materialSwitch(inputId = "kadapt", label = strong("Adaptive Bandwidth"), status = "danger"), 
@@ -469,7 +482,9 @@ body <- dashboardBody(tabItems(
                                #conditionalPanel(condition = "input.plot == true",
                                p("Plot takes a moment to load"),
                                p("Data points can be clicked for more information"),
-                               tmapOutput("res_plot", height=600)),
+                               tmapOutput("res_plot", height=600),
+                               verbatimTextOutput("morani")
+                               ),
                       
                       tabPanel("Fixed Bandwidth GWR", icon = icon("ruler"),
                                tabsetPanel(tabPanel("GWR Map", icon= icon("map"),
@@ -692,6 +707,85 @@ server <- function(input, output) {
       sp_resale_flat
     })
     
+    moran <- reactive({
+      sf_resale_flat <- processed_table()
+      sp_resale_flat <- fixing()
+      nb <- dnearneigh(coordinates(sp_resale_flat), 0, 2000, longlat = FALSE)
+      cnt <- card(nb)
+      ind <- match(0, cnt)
+      if(is.na(ind) == FALSE){
+        nearest <- knearneigh(coordinates(sp_resale_flat))$nn
+        print(nb[[ind]])
+        nb[[ind]] <- nearest[ind]
+        nb[[nearest[ind]]] <- c(as.integer(100), as.integer(nb[[nearest[ind]]]))
+      }
+      nb_lw <- nb2listw(nb, style = 'W')
+      mylist <- c()
+      if (input$mrt==TRUE) {
+        newelem <- 'mrt_count'
+        mylist <- c(mylist, newelem)
+      }
+
+      if (input$pschool=="TRUE") {
+        newelem <- 'pri_school_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$sschool=="TRUE") {
+        newelem <- 'sec_school_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$cc=="TRUE") {
+        newelem <- 'community_center_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$supermarket=="TRUE") {
+        newelem <- 'supermarket_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$sport=="TRUE") {
+        newelem <- 'sport_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$preschool=="TRUE") {
+        newelem <- 'preschool_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$hawker=="TRUE") {
+        newelem <- 'hawker_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$mall=="TRUE") {
+        newelem <- 'mall_count'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$floor_incl=="TRUE") {
+        newelem <- 'floor_area_sqm'
+        mylist <- c(mylist, newelem)
+      }
+      if (input$flat_incl=="TRUE") {
+        newelem <- 'flat_type_code'
+        mylist <- c(mylist, newelem)
+      }
+      #GwrFormula <- as.formula(paste('resale_price',paste(mylist, collapse="+"), sep="~"))
+      GwrFormula <- formula()
+      resale_flat.mlr <- lm(formula = GwrFormula, data=sf_resale_flat)
+      lm.morantest(resale_flat.mlr, nb_lw)
+    })
+    
+    corr <- reactive({
+      sf_resale_flat <- processed_table()
+      test = st_drop_geometry(sf_resale_flat)
+      drop <- c("resale_price", "town", "month", "block", "street_name", "Address", "flat_type", "storey_range", "remaining_lease", "remaining_lease_nearest_year")
+      test = test[,!(names(test) %in% drop)]
+      test$flat_type_code <- as.numeric(test$flat_type_code)
+      #test$resale_price <- as.numeric(test$resale_price)
+      test$floor_area_sqm <- as.numeric(test$floor_area_sqm)
+      #print(test)
+      #test$remaining_lease_nearest_year <- as.numeric(test$remaining_lease_nearest_year)
+      #test[10:18]
+      corrplot(cor(test), diag = FALSE, order = "AOE", tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
+    })
+    
     kernel_check <- reactive({
       if (input$kernel == "Gaussian"){
         kernel <- "gaussian"
@@ -705,45 +799,62 @@ server <- function(input, output) {
         kernel <- "boxcar"
       } 
     })
-    
-    GWR_fixed <- reactive({
-      sp_resale_flat <- fixing()
+
+    formula<-reactive({
       mylist <- c()
-      if (input$mrt_incl==TRUE) {
-        newelem <- 'mrt_count'
-        mylist <- c(mylist, newelem)
+      if (input$mrt==TRUE) {
+        if (input$mrt_incl==TRUE) {
+          newelem <- 'mrt_count'
+          mylist <- c(mylist, newelem)
+          }
       }
-      if (input$pschool_incl=="TRUE") {
-        newelem <- 'pri_school_count'
-        mylist <- c(mylist, newelem)
+      if (input$pschool=="TRUE") {
+        if (input$pschool_incl=="TRUE") {
+          newelem <- 'pri_school_count'
+          mylist <- c(mylist, newelem)
+        }
       }
-      if (input$sschool_incl=="TRUE") {
-        newelem <- 'sec_school_count'
-        mylist <- c(mylist, newelem)
+      if (input$sschool=="TRUE") {
+        if (input$sschool_incl=="TRUE") {
+          newelem <- 'sec_school_count'
+          mylist <- c(mylist, newelem)
+        }
       }
-      if (input$cc_incl=="TRUE") {
-        newelem <- 'community_center_count'
-        mylist <- c(mylist, newelem)
+      if (input$cc=="TRUE") {
+        if (input$cc_incl=="TRUE") {
+          newelem <- 'community_center_count'
+          mylist <- c(mylist, newelem)
+        }
       }
       if (input$supermarket_incl=="TRUE") {
-        newelem <- 'supermarket_count'
-        mylist <- c(mylist, newelem)
+        if (input$supermarket_incl=="TRUE") {
+          newelem <- 'supermarket_count'
+          mylist <- c(mylist, newelem)
+        }
       }
-      if (input$sport_incl=="TRUE") {
-        newelem <- 'sport_count'
-        mylist <- c(mylist, newelem)
+      if (input$sport=="TRUE") {
+        if (input$sport_incl=="TRUE") {
+          newelem <- 'sport_count'
+          mylist <- c(mylist, newelem)
+        }
       }
-      if (input$preschool_incl=="TRUE") {
-        newelem <- 'preschool_count'
-        mylist <- c(mylist, newelem)
+      if (input$preschool=="TRUE") {
+        if (input$preschool_incl=="TRUE") {
+          newelem <- 'preschool_count'
+          mylist <- c(mylist, newelem)
+        }
       }
-      if (input$hawker_incl=="TRUE") {
-        newelem <- 'hawker_count'
-        mylist <- c(mylist, newelem)
+      if (input$hawker=="TRUE") {
+        if (input$hawker_incl=="TRUE") {
+          newelem <- 'hawker_count'
+          mylist <- c(mylist, newelem)
+        }
       }
       if (input$mall_incl=="TRUE") {
-        newelem <- 'mall_count'
-        mylist <- c(mylist, newelem)
+        if (input$mall_incl=="TRUE") {
+          newelem <- 'mall_count'
+          mylist <- c(mylist, newelem)
+        }
       }
       if (input$floor_incl=="TRUE") {
         newelem <- 'floor_area_sqm'
@@ -753,9 +864,13 @@ server <- function(input, output) {
         newelem <- 'flat_type_code'
         mylist <- c(mylist, newelem)
       }
-      
-      kernel = kernel_check()
       GwrFormula <- as.formula(paste('resale_price',paste(mylist, collapse="+"), sep="~"))
+    })
+    
+    GWR_fixed <- reactive({
+      sp_resale_flat <- fixing()
+      kernel = kernel_check()
+      GwrFormula <- formula()
       bw.fixed <- bw.gwr(formula=GwrFormula, data=sp_resale_flat, approach="CV", kernel=kernel, adaptive=FALSE, longlat=FALSE)
       set.seed(0)
       if (input$auto == "TRUE"){
@@ -765,7 +880,7 @@ server <- function(input, output) {
         gwr.fixed <- gwr.basic(formula=GwrFormula, data=sp_resale_flat, bw=input$bandwidth, kernel = kernel, longlat = FALSE)
       }
       })
-    
+
     GWR_adapt <- reactive({
       sp_resale_flat <- fixing()
       mylist <- c()
@@ -814,7 +929,8 @@ server <- function(input, output) {
         mylist <- c(mylist, newelem)
       }
       kernel = kernel_check()
-      GwrFormula <- as.formula(paste('resale_price',paste(mylist, collapse="+"), sep="~"))
+      GwrFormula <- formula()
+      #GwrFormula <- as.formula(paste('resale_price',paste(mylist, collapse="+"), sep="~"))
       bw.adaptive <- bw.gwr(formula=GwrFormula, data=sp_resale_flat, approach="CV", kernel=kernel, adaptive=TRUE, longlat=FALSE)
       set.seed(0)
       gwr.adaptive <- gwr.basic(formula = GwrFormula, data=sp_resale_flat, bw=bw.adaptive, kernel = kernel, adaptive=TRUE, longlat = FALSE)
@@ -846,7 +962,7 @@ server <- function(input, output) {
                 id = "Address",
                 popup.vars = c("town", "Address", "resale_price"),
                 alpha = 0.6,
-                size = 0.5,
+                size = 0.2,
                 style="quantile") +
         tm_view(set.zoom.limits = c(11,14))
     })
@@ -861,7 +977,6 @@ server <- function(input, output) {
                 #style="quantile") +
         #tm_view(set.zoom.limits = c(11,14))
     #})
-
       output$fixed_plot1 <- renderTmap({
         tm_shape(sf_mpsz2019)+
           #tm_fill()+
@@ -870,7 +985,8 @@ server <- function(input, output) {
           tm_dots(col = "Local_R2",
                   id = "Address",
                   popup.vars = c("town", "Address", "resale_price"),
-                  size = 0.5,
+                  alpha = 0.6,
+                  size = 0.2,
                   border.col = "gray60",
                   border.lwd = 1) +
           tm_view(set.zoom.limits = c(11,14))
@@ -885,7 +1001,8 @@ server <- function(input, output) {
           tm_dots(col = "Local_R2",
                   id = "Address",
                   popup.vars = c("town", "Address", "resale_price"),
-                  size = 0.5,
+                  alpha = 0.6,
+                  size = 0.2,
                   border.col = "gray60",
                   border.lwd = 1) +
           tm_view(set.zoom.limits = c(11,14))
@@ -934,7 +1051,18 @@ server <- function(input, output) {
       GWR
     })
     
+    output$morani <- renderPrint({
+      test<-moran()
+      test
+    })
     
+      
+      output$corr <- renderPrint({
+        corr<-corr()
+        corr
+    })
+
+
     sliderValues <- reactive({
       data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Hawkers", "Shopping Malls"), 
                  Value = as.character(c(input$mrtWidth, input$schoolWidth, input$supermarketWidth, input$sportWidth, input$preschoolWidth, input$parkWidth, input$hawkerWidth, input$mallWidth)

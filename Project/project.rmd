@@ -329,12 +329,14 @@ sf_resale_flat <- st_as_sf(testtest)
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 test = st_drop_geometry(sf_resale_flat)
-drop <- c("block", "street_name", "Address", "floor_area_sqm", "log_resale_price", "flat_type", "storey_range", "remaining_lease")
+#drop <- c("block", "street_name", "Address", "floor_area_sqm", "log_resale_price", "flat_type", "storey_range", "remaining_lease")
+drop <- c("town", "block", "street_name", "Address", "floor_area_sqm", "flat_type", "storey_range", "remaining_lease", "remaining_lease_nearest_year")
 test = test[,!(names(test) %in% drop)]
 test$flat_type_code <- as.numeric(test$flat_type_code)
-test$remaining_lease_nearest_year <- as.numeric(test$remaining_lease_nearest_year)
+#test$remaining_lease_nearest_year <- as.numeric(test$remaining_lease_nearest_year)
 #test[10:18]
-corrplot(cor(test[, 2:13]), diag = FALSE, order = "AOE", tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
+test
+corrplot(cor(test), diag = FALSE, order = "AOE", tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
 #corrplot(cor(test[, 10:18]), diag = FALSE, order = "AOE", tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
 ```
 
@@ -398,19 +400,20 @@ tmap_mode("plot")
 ```
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-nb <- dnearneigh(coordinates(sp_resale_flat), 0, 2000, longlat = FALSE)
+nb <- dnearneigh(coordinates(sp_resale_flat), 0, 3000, longlat = FALSE)
 #card(nb)
 summary(nb)
+#nb[296]
 ```
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
 cnt <- card(nb)
 ind <- match(0, cnt)
+print(ind)
 #print(island_ind)
 nearest <- knearneigh(coordinates(sp_resale_flat))$nn
 nb[[ind]] <- nearest[ind]
 
-# We need to add this island to the neighbours of its connected municipality as well
-nb[[nearest[ind]]] <- c(as.integer(100), as.integer(nb[[nearest[ind]]]))
+# We need to add this island to the neighbours of its connected municipality as well#nb[[nearest[ind]]] <- c(as.integer(100), as.integer(nb[[nearest[ind]]]))
 ```
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
@@ -423,12 +426,12 @@ lm.morantest(resale_flat.mlr1, nb_lw)
 ```
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
-bw.fixed <- bw.gwr(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data=sp_resale_flat, approach="CV", kernel="gaussian", adaptive=FALSE, longlat=FALSE)
+bw.fixed <- bw.gwr(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data=sp_resale_flat, approach="CV", kernel="bisquare", adaptive=FALSE, longlat=FALSE)
 
 #bw.adaptive <- bw.gwr(formula = resale_price ~ floor_area_sqm + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count +preschool_count + hawker_count + mall_count, data = sp_resale_flat, approach="CV", kernel="gaussian", adaptive=TRUE, longlat=FALSE)
 
 set.seed(0)
-gwr.fixed <- gwr.basic(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data = sp_resale_flat, bw=bw.fixed, kernel = 'gaussian', longlat = FALSE)
+gwr.fixed <- gwr.basic(formula = resale_price ~ flat_type_code + mrt_count + pri_school_count + sec_school_count + community_center_count + supermarket_count + preschool_count + hawker_count + mall_count, data = sp_resale_flat, bw=bw.fixed, kernel = 'bisquare', longlat = FALSE)
 ```
 
 ```{r echo=TRUE, message=FALSE, warning= FALSE}
