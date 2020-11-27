@@ -229,6 +229,16 @@ sf_supermarket <- st_as_sf(new_supermarket, coords = c("X","Y"),crs= 3414)
 sf_supermarket <- st_transform(sf_supermarket, 3414)
 st_crs(sf_supermarket)
 
+#print(st_crs(sf_resale_flat))
+#print(st_crs(sf_pschool))
+#print(st_crs(sf_sschool))
+#print(st_crs(sf_hawkercenter))
+#print(st_crs(sf_mall))
+#print(st_crs(sf_preschool))
+#print(st_crs(sf_supermarket))
+#print(st_crs(sf_cc))
+#print(st_crs(sf_sport_facilities))
+
 
 header <- dashboardHeader(title = "$patial")
 
@@ -319,106 +329,99 @@ body <- dashboardBody(tabItems(
 
                       tabPanel("View Data", icon = icon("database"), 
                                h3("Select variables to view in the HDB Resale Data"), 
+                               p(strong("If error message appears, filter is too specific resulting in too little data for sampling which affects analysis, please filter by only town or flat type at a single time or choose a smaller sample size.", style='color:red')),
                                #div(selectInput("month", "Month", choices=c("All", "2020-01", "2020-02", "2020-03" , "2020-04", "2020-05", "2020-06",
                                                                            #"2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12")), 
                                    #style="display:inline-block"),
                                div(selectInput("town", "Town", choices = c("All", sf_resale_flat$town))),
                                div(selectInput("flat", "Flat Type", choices=c("All", "1 ROOM", "2 ROOM", "3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE", "MULTI-GENERATION" )), 
                                    style="display:inline-block"),
-                               div(selectInput("sample", "Sample Size", choices = c("100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"))),
                                p(strong("Note: The larger the sample size, the longer it takes for the GWR model to run")),
-                               p(strong("If error message appears, filter is too specific resulting in too little data for analysis, please filter by only town or flat type at a single time.", style='color:red')),
+                               div(selectInput("sample", "Sample Size", choices = c("100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"))),
                                br(),
                                
                                DT::dataTableOutput(outputId = "popTab"), 
                                div(style = 'overflow-x: sschoocroll', tableOutput("Table"))), 
-                      tabPanel("Analysis", icon = icon("chart-bar"), tabsetPanel(tabPanel("Histogram", "Histogram of Table Data", icon = icon("poll"),
-                                                                                          p("Histogram of Resale Flat Price"),
+                      tabPanel("Analysis", icon = icon("chart-bar"), tabsetPanel(tabPanel("Histogram", icon = icon("poll"),
+                                                                                          p("Histogram of Resale Flat Price", style = "font-size:30px;"),
                                                                                           plotlyOutput("resale"),
-                                                                                          p("Histogram of Floor Area"),
+                                                                                          p("Histogram of Floor Area", style = "font-size:30px;"),
                                                                                           plotlyOutput("floorarea"),
-                                                                                          p("Histogram of Flat Type"),
+                                                                                          p("Histogram of Flat Type", style = "font-size:30px;"),
                                                                                           p("Legend: 1 - 1 Room Flat, 2 - 2 Room Flat, 3 - 3 Room Flat , 4 - 4 Room Flat, 5 - 5 Room Flat, 6 - Executive, 7 - Multi-Generation"),
                                                                                           plotlyOutput("flattype"),
                                                                                           conditionalPanel(condition = "input.mrt == true", 
-                                                                                                           p("Histogram of MRT Count"),
+                                                                                                           p("Histogram of MRT Count", style = "font-size:30px;"),
                                                                                                            plotlyOutput("mrt_hist")),
                                                                                           conditionalPanel("input.pschool == true",
-                                                                                                           p("Histogram of Primary School Count"),
+                                                                                                           p("Histogram of Primary School Count", style = "font-size:30px;"),
                                                                                                            plotlyOutput("pschool_hist")),
                                                                                           conditionalPanel(condition = "input.sschool == true",
-                                                                                                           p("Histogram of Secondary School Count"),
+                                                                                                           p("Histogram of Secondary School Count", style = "font-size:30px;"),
                                                                                                            plotlyOutput("sschool_hist")),
                                                                                           conditionalPanel(condition = "input.cc == true",
-                                                                                                           p("Histogram of Community Center Count"),
+                                                                                                           p("Histogram of Community Center Count", style = "font-size:30px;"),
                                                                                                            plotlyOutput("cc_hist")),
                                                                                           conditionalPanel(condition = "input.supermarket == true",
-                                                                                                           p("Histogram of Supermarket Count"),
+                                                                                                           p("Histogram of Supermarket Count", style = "font-size:30px;"),
                                                                                                            plotlyOutput("supermarket_hist")),
                                                                                           conditionalPanel(condition = "input.sport == true",
-                                                                                                           p("Histogram of Sports Facilities Count"),
+                                                                                                           p("Histogram of Sports Facilities Count", style = "font-size:30px;"),
                                                                                                            plotlyOutput("sport_hist")),
                                                                                           conditionalPanel(condition = "input.preschool == true",
-                                                                                                           p("Histogram of Preschool Count"),
+                                                                                                           p("Histogram of Preschool Count", style = "font-size:30px;"),
                                                                                                            plotlyOutput("preschool_hist")),
                                                                                           conditionalPanel(condition = "input.hawker == true",
-                                                                                                           p("Histogram of Hawker Center Count"),
+                                                                                                           p("Histogram of Hawker Center Count", style = "font-size:30px;"),
                                                                                                            plotlyOutput("hawker_hist")),
                                                                                           conditionalPanel(condition = "input.mall == true",
-                                                                                                           p("Histogram of Shopping Mall Count"),
+                                                                                                           p("Histogram of Shopping Mall Count", style = "font-size:30px;"),
                                                                                                            plotlyOutput("mall_hist"))), 
-                               tabPanel("Boxplot", "Boxplot of Table Data",
+                               tabPanel("Boxplot For Resale Price",
                                conditionalPanel(condition = "input.town == 'All'",
-                                                selectInput("town2", "Please use this filter only if filter in previous tab for Town is All", choices = c("All", sf_resale_flat$town))),
-                               plotlyOutput("resale_box", width = "1400px", height = "1400px")),
+                                                selectInput("town2", "Please use this filter only if filter in previous tab for Town is 'All'", choices = c("All", sf_resale_flat$town))),
+                               plotlyOutput("resale_box", width = "1400px", height = "2000px")),
         
-                               tabPanel("Boxplot For Selected Features", "Boxplot of Selected Features",
+                               tabPanel("Boxplot For Selected Features",
+                                        p("This tab will be empty if nothing is selected in the feature selection tab", style='color:red'),
                                conditionalPanel(condition = "input.mrt == true",
+                                                p("Boxplot of MRT Count", style = "font-size:30px;"),
                                plotlyOutput("mrt_box")),
                                conditionalPanel("input.pschool == true",
+                                                p("Boxplot of Primary School Count", style = "font-size:30px;"),
                                plotlyOutput("pschool_box")),
                                conditionalPanel(condition = "input.sschool == true",
+                                                p("Boxplot of Secondary School Count", style = "font-size:30px;"),
                                plotlyOutput("sschool_box")),
                                conditionalPanel(condition = "input.cc == true",
+                                                p("Boxplot of Community Center Count", style = "font-size:30px;"),
                                plotlyOutput("cc_box")),
                                conditionalPanel(condition = "input.supermarket == true",
+                                                p("Boxplot of Supermarket Count", style = "font-size:30px;"),
                                plotlyOutput("supermarket_box")),
                                conditionalPanel(condition = "input.sport == true",
+                                                p("Boxplot of Sports Facility Count", style = "font-size:30px;"),
                                plotlyOutput("sport_box")),
                                conditionalPanel(condition = "input.preschool == true",
+                                                p("Boxplot of Preschool Count", style = "font-size:30px;"),
                                plotlyOutput("preschool_box")),
                                conditionalPanel(condition = "input.hawker == true",
+                                                p("Boxplot of Hawker Count", style = "font-size:30px;"),
                                plotlyOutput("hawker_box")),
                                conditionalPanel(condition = "input.mall == true",
-                               plotlyOutput("mall_box"))),
+                                                p("Boxplot of Shopping Mall Count", style = "font-size:30px;"),
+                               plotlyOutput("mall_box")))
                                
-                               tabPanel("Spatial Autocorrelation", "Spatial Autocorrelation",
-                               #plotlyOutput("resplot", width = "1400px", height = "1400px")),
-                               plotOutput("res_plot"))
+
                                
                                )))), 
           
   tabItem(tabName="GWR", 
           tabsetPanel(tabPanel("Settings", icon = icon("cogs"),
-                               h3("Bandwidth Selection"),
-                               materialSwitch(inputId = "fix", label = strong("Fixed Bandwidth"), status = "danger"),
-                               #checkboxInput(inputId = "auto", label = "Auto Fixed Bandwidth", value= FALSE),
-                               conditionalPanel(condition = "input.fix == true",
-                                checkboxInput(inputId = "auto", label = "Auto Fixed Bandwidth", value= FALSE),
-                                 conditionalPanel(condition = "input.auto == false",
-                                   numericInput("bandwidth", "Manual Input Fixed Bandwidth: ", 1000,
-                                                min = NA,
-                                                max = NA,
-                                                step = NA,
-                                                width = NULL))),
-                               #checkboxInput(inputId = "kadapt", label = "Adaptive Bandwidth", value= FALSE),
-                               materialSwitch(inputId = "kadapt", label = strong("Adaptive Bandwidth"), status = "danger"), 
-                               h3("Kernel Selection"), 
-                               selectInput(inputId = "kernel", label = "Select Kernel type: ", 
-                                           choices = c("Gaussian", "Exponential", "Bi-square", "Tricube", "Boxcar")), 
-                               br(),
-                               h3("Independant Variables"), 
-                               checkboxInput(inputId = "floor_incl", label = "Floor_area_sqm", value= FALSE),
+                               h3("GWR formula: y = b0 + b1x1 + e (where y is the dependent variable, x1 is the independent variable, b0 and b1, are the parameters to be estimated, and e is a random error term)"),
+                               h3("Fixed Dependent Variable(y): Resale Price"), 
+                               h3("Please pick at least 1 Independant Variable (x) below to formulate GWR formula"), 
+                               checkboxInput(inputId = "floor_incl", label = "Floor_area_sqm", value= TRUE),
                                checkboxInput(inputId = "flat_incl", label = "Flat Type", value= FALSE),
                                conditionalPanel(condition = "input.mrt == true",
                                                 checkboxInput(inputId = "mrt_incl", label = "MRT", value= FALSE)),
@@ -437,28 +440,68 @@ body <- dashboardBody(tabItems(
                                conditionalPanel(condition = "input.hawker == true",
                                                 checkboxInput(inputId = "hawker_incl", label = "Hawker", value= FALSE)),
                                conditionalPanel(condition = "input.mall == true",
-                                                checkboxInput(inputId = "mall_incl", label = "Shopping Mall", value= FALSE))),
-                      tabPanel("Fixed Bandwidth", icon = icon("ruler"),
+                                                checkboxInput(inputId = "mall_incl", label = "Shopping Mall", value= FALSE)),
+                               br(),
+                               
+                               h3("Bandwidth Selection for GWR modelling"),
+                               materialSwitch(inputId = "fix", label = strong("Fixed Bandwidth"), status = "danger"),
+                               #checkboxInput(inputId = "auto", label = "Auto Fixed Bandwidth", value= FALSE),
+                               conditionalPanel(condition = "input.fix == true",
+                                                checkboxInput(inputId = "auto", label = "Auto Fixed Bandwidth", value= FALSE),
+                                                conditionalPanel(condition = "input.auto == false",
+                                                                 numericInput("bandwidth", "Manual Input Fixed Bandwidth: ", 1000,
+                                                                              min = NA,
+                                                                              max = NA,
+                                                                              step = NA,
+                                                                              width = NULL))),
+                               #checkboxInput(inputId = "kadapt", label = "Adaptive Bandwidth", value= FALSE),
+                               materialSwitch(inputId = "kadapt", label = strong("Adaptive Bandwidth"), status = "danger"), 
+                               h3("Kernel Selection"), 
+                               selectInput(inputId = "kernel", label = "Select Kernel type: ", 
+                                           choices = c("Gaussian", "Exponential", "Bi-square", "Tricube", "Boxcar")),
+                               #actionButton("plot", "Plot models"),
+                               ),
+                      
+                      tabPanel("Spatial Autocorrelation",
+                               #conditionalPanel(condition = "input.plot == false",
+                                                #p("Please fill in information in previous tab to see plot on this page", style='color:red')),
+                               #plotlyOutput("resplot", width = "1400px", height = "1400px")),
+                               #conditionalPanel(condition = "input.plot == true",
+                               p("Plot takes a moment to load"),
+                               p("Data points can be clicked for more information"),
+                               tmapOutput("res_plot", height=600)),
+                      
+                      tabPanel("Fixed Bandwidth GWR", icon = icon("ruler"),
                                tabsetPanel(tabPanel("GWR Map", icon= icon("map"),
                                                     #actionButton("plot", "Plot map"),
                                                     conditionalPanel(condition = "input.fix == false",
-                                                    p("Please check the Fixed Bandwidth option to see plot on this page")),
+                                                    p("Please check the Fixed Bandwidth option to see plot on this page", style='color:red')),
                                                     
                                                     conditionalPanel(#condition = "input.plot == true",
                                                                      condition = "input.fix == true",
                                                                      p("Plot takes a moment to load"),
+                                                                     p("Data points can be clicked for more information"),
                                                                      #plotOutput("fixed_plot"))), 
-                                                                     tmapOutput("fixed_plot1"))),
-                                           tabPanel("GWR Data Output", icon= icon("file-excel")))), 
-                      tabPanel("Adaptive Bandwidth",icon = icon("ruler"),
+                                                                     tmapOutput("fixed_plot1", height=600))),
+                                           tabPanel("GWR Data Output", icon= icon("file-excel"),
+                                                    conditionalPanel(condition = "input.fix == false",
+                                                                     p("Please check the Fixed Bandwidth option to see plot on this page", style='color:red')),
+                                                    conditionalPanel(condition = "input.fix == true",
+                                           verbatimTextOutput("fixsum"))))), 
+                      tabPanel("Adaptive Bandwidth GWR",icon = icon("ruler"),
                                tabsetPanel(tabPanel("GWR Map", icon= icon("map"),
                                                     conditionalPanel(condition = "input.kadapt == false",
-                                                                     p("Please check the Adaptive Bandwidth option to see plot on this page")),
+                                                                     p("Please check the Adaptive Bandwidth option to see plot on this page", style='color:red')),
                                                     conditionalPanel(condition = "input.kadapt == true",
                                                                      p("Plot takes a moment to load"),
+                                                                     p("Data points can be clicked for more information"),
                                                                      #plotOutput("adapt_plot"))),
-                                                                     tmapOutput("adapt_plot1"))),
-                                           tabPanel("GWR Data Output", icon = icon("file-excel"))))
+                                                                     tmapOutput("adapt_plot1", height=600))),
+                                           tabPanel("GWR Data Output", icon = icon("file-excel"),
+                                                    conditionalPanel(condition = "input.kadapt == false",
+                                                                     p("Please check the Adaptive Bandwidth option to see plot on this page", style='color:red')),
+                                                    conditionalPanel(condition = "input.kadapt == true",
+                                           verbatimTextOutput("adaptsum")))))
                                
                                
                                ))))
@@ -481,6 +524,7 @@ server <- function(input, output) {
       testtest <- as_Spatial(sf_resale_flat)
       testtest <- testtest[sample(1:length(testtest),input$sample),]
       sf_resale_flat <- st_as_sf(testtest)
+      sf_resale_flat <- st_transform(sf_resale_flat, 3414)
       if (input$mrt==TRUE) {
         buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
         sf_resale_flat <- sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_mrt, sf_mrt)))
@@ -640,7 +684,7 @@ server <- function(input, output) {
     fixing <- reactive({
       sf_resale_flat <- restable()
       sp_resale_flat <- as_Spatial(sf_resale_flat)
-      drop <- c("month", "town", "block", "street_name", "Address", "flat_type", "storey_range", "remaining_lease", "remaining_lease_nearest_year")
+      drop <- c("month", "town", "block", "street_name", "flat_type", "storey_range", "remaining_lease", "remaining_lease_nearest_year")
       sp_resale_flat <- sp_resale_flat[,!(names(sp_resale_flat@data) %in% drop)]
       sp_resale_flat@data <- sp_resale_flat@data %>% mutate(resale_price = as.numeric(resale_price))
       sp_resale_flat@data <- sp_resale_flat@data %>% mutate(flat_type_code = as.numeric(flat_type_code))
@@ -793,23 +837,40 @@ server <- function(input, output) {
       resale.sf.fixed <- cbind(restable(), as.matrix(gwr.adapt.output))
     })
     
-    output$res_plot <- renderPlot({
+    output$res_plot <- renderTmap({
       tm_shape(sf_mpsz2019)+
-        tm_fill()+
+        #tm_polygons()+
         tm_borders(lwd = 1, alpha = 1) +
         tm_shape(restable()) +  
         tm_dots(col = "MLR_RES",
+                id = "Address",
+                popup.vars = c("town", "Address", "resale_price"),
                 alpha = 0.6,
+                size = 0.5,
                 style="quantile") +
         tm_view(set.zoom.limits = c(11,14))
     })
+    
+    #output$res_plot <- renderTmap({
+      #tm_shape(sf_mpsz2019)+
+        #tm_fill()+
+        #tm_borders(lwd = 1, alpha = 1) +
+        #tm_shape(restable()) +  
+        #tm_dots(col = "MLR_RES",
+                #alpha = 0.6,
+                #style="quantile") +
+        #tm_view(set.zoom.limits = c(11,14))
+    #})
 
       output$fixed_plot1 <- renderTmap({
         tm_shape(sf_mpsz2019)+
-          tm_fill()+
+          #tm_fill()+
           tm_borders(lwd = 1, alpha = 1) +
           tm_shape(plot_fix()) +  
           tm_dots(col = "Local_R2",
+                  id = "Address",
+                  popup.vars = c("town", "Address", "resale_price"),
+                  size = 0.5,
                   border.col = "gray60",
                   border.lwd = 1) +
           tm_view(set.zoom.limits = c(11,14))
@@ -818,10 +879,13 @@ server <- function(input, output) {
 
       output$adapt_plot1 <- renderTmap({
         tm_shape(sf_mpsz2019)+
-          tm_fill()+
+          #tm_fill()+
           tm_borders(lwd = 1, alpha = 1) +
           tm_shape(plot_adapt()) +  
           tm_dots(col = "Local_R2",
+                  id = "Address",
+                  popup.vars = c("town", "Address", "resale_price"),
+                  size = 0.5,
                   border.col = "gray60",
                   border.lwd = 1) +
           tm_view(set.zoom.limits = c(11,14))
@@ -850,15 +914,26 @@ server <- function(input, output) {
         tm_view(set.zoom.limits = c(11,14))
     })
     
-    output$resplot <- renderPlot({
-      tm_shape(sf_mpsz2019)+
-        tm_polygons(alpha = 0.4) +
-        tm_shape(restable()) +  
-        tm_dots(col = "MLR_RES",
-                alpha = 0.6,
-                style="quantile") +
-        tm_view(set.zoom.limits = c(11,14))
+    #output$resplot <- renderTmap({
+      #tm_shape(sf_mpsz2019)+
+        #tm_polygons(alpha = 0.4) +
+        #tm_shape(restable()) +  
+        #tm_dots(col = "MLR_RES",
+                #alpha = 0.6,
+                #style="quantile") +
+        #tm_view(set.zoom.limits = c(11,14))
+    #})
+    
+    output$fixsum <- renderPrint({
+      GWR<-GWR_fixed()
+      GWR
     })
+    
+    output$adaptsum <- renderPrint({
+      GWR<-GWR_adapt()
+      GWR
+    })
+    
     
     sliderValues <- reactive({
       data.frame(Name = c("MRT", "Schools", "Supermarkets", "Sports","Preschools","Hawkers", "Shopping Malls"), 
@@ -945,10 +1020,10 @@ server <- function(input, output) {
         if(input$town2 != "All"){
           sf_resale_flat <- sf_resale_flat%>%filter(town == input$town2)
         }
-        ggplot(sf_resale_flat, aes(x = flat_type, y = resale_price)) + geom_boxplot()
+        ggplot(sf_resale_flat, aes(x = flat_type, y = resale_price, fill = flat_type)) + geom_boxplot()
       }
       else{
-        ggplot(sf_resale_flat, aes(x = flat_type, y = resale_price)) + geom_boxplot()
+        ggplot(sf_resale_flat, aes(x = flat_type, y = resale_price, fill = flat_type)) + geom_boxplot()
       }
     })
     
@@ -966,6 +1041,7 @@ server <- function(input, output) {
       buffer_mrt <- st_buffer(sf_resale_flat, input$mrtWidth)
       sf_resale_flat <- sf_resale_flat %>% mutate(mrt_count = lengths(st_intersects(buffer_mrt, sf_mrt)))
       ggplot(sf_resale_flat, aes(x = input$choice , y = mrt_count)) + geom_boxplot()
+      #ggplot(sf_resale_flat, aes(x = town , y = mrt_count, fill = town)) + geom_boxplot()
     })
     
     output$pschool_box <- renderPlotly({
