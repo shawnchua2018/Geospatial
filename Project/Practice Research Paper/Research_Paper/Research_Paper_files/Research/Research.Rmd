@@ -25,8 +25,9 @@ abstract: |
 
 bibliography: sigproc.bib
 csl: acm-sig-proceedings.csl
-output: rticles::acm_article
-  latex_engine: xelatex
+output: 
+  rticles::acm_article: 
+    extra_dependencies: ["float"]
 
 
 ---
@@ -112,68 +113,92 @@ $patial makes use of the GWR model, a local statistical technique to analyze spa
 \caption{Application Architecture Diagram}\label{fig2}
 \end{figure}\
 
-eqn represents the value of the output variable at the coordinate location i , eqn  denotes the coordinates of the i-th point in space and β_k (u_i,u_v) is a realization of the continuous functions at point i (Brunsdon et al., 1999). 
+eqn represents the value of the output variable at the coordinate location i , eqn  denotes the coordinates of the i-th point in space and EQN is a realization of the continuous functions at point i (Brunsdon et al., 1999). 
 The values used in the formula depends on the location and surrounding of the observations with reference to its spatial context. In general, GWR measures the inherent relationships around each regression point i, each set of regression coefficient is estimated by weighted least squares (Lu et al., 2014). 
 
 
 The GWR has to be calibrated before it can be used for processing. To calibrate the formula, firstly we need to distinguish between the different weighting kernel functions listed below:\
 1.	Gaussian\
-2.	Exponential\ 
+2.	Exponential\
 3.	Box-car\
 4.	Bi-square\
 5.	Tri-cube\
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=8cm]{function.png}
-\caption{Plots showing the different weighting kernel functions}\label{fig3}
-\end{figure}\
+![Figure 3 - Plots showing the different weighting kernel functions](function.png)\
 
 The weighting kernels functions are classified into two categories – Continuous and Discontinuous kernels. 
 Continuous kernels are Gaussian and Exponential kernels where the kernels weight all the observations with a weight that tends towards zero but never produces a zero value (Bellefon & Floch, n.d.).\
 
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=5cm]{continuous.png}
-\caption{Formula of Continuous Kernels}\label{fig4}
-\end{figure}\
+![Figure 4 -Formula of Continuous Kernels](continuous.png)\
 
 The kernels that fall into the discontinuous categories are Box-car, Bi-square and Tri-cube. The Box-Car kernel handles a continuous observation in a discontinuous method and Bi-square, Tri-cube kernels produce observations that are of decreasing weight with increasing distance however the weight gives a zero value beyond the specified distance b called bandwidth as seen in figure 5 shown below.\
 
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=8cm]{discontinuous.png}
-\caption{Formula of Discontinuous Kernels}\label{fig5}
-\end{figure}\
+![Figure 5 - Formula of Discontinuous Kernels](discontinuous.png)\
 
 Secondly, there is a need to determine fixed kernel versus adaptive kernel. 
 Fixed Kernel represents the extent of the kernel that is determined by the distance to the point of interest which is fixed and hence the kernel would appear the same  at any location (Bellefon & Floch, n.d.). Additionally, a fixed kernel causes the regression to vary significantly as in low-density areas, if the fixed kernel is too small the number of points that is used in regression would be too little whereas if the area is dense a fixed kernel that is too large would overlook the variations in the area. Hence another alternative would be the adaptive kernel which represents the extent of the kernel that is determined by the number of neighbors that the point of interest has which varies according to the bandwidth adjusted according to the context of the observation in which the bandwidth increases and decreases following the density of the data points. 
 Lastly, there is a need to calibrate the choice of bandwidth used in the GWR model as the bandwidth chosen affects the results produced. Aside from allowing users to input the pre-defined bandwidth of their choice, there exists two other statistical methods which can assist in choosing the most suitable bandwidth. 
 Firstly, the cross-validation criteria given by the formula as shown in figure 6.\
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=5cm]{cv.png}
-\caption{Formula of cross-validation criteria}\label{fig6}
-\end{figure}\
+![Figure 6 - Formula of cross-validation criteria](cv.png)\
 
 CV represents the cross-validation score and h  represents the bandwidth. If bandwidth h, minimizes the cross-validation score it is the most suitable bandwidth value as it maximizes the GWR model’s predictive power (Bellefon & Floch, n.d.). 
 
 Secondly, the adjusted akaike criterion given by the formula as shown in figure 7.\
-\begin{figure}[h]
-\centering
-\includegraphics[width=8cm]{aac.png}
-\caption{Formula of Adjusted Akaike Criterion}\label{fig7}
-\end{figure}\
-
+![Figure 7 - Formula of Adjusted Akaike Criterion](aac.png)\
 
 n represents the sample size which and h represents the bandwidth. The AIC criterion generally prefers larger bandwidth values as compared to the cross-validation criterion. 
 Therefore, the value of bandwidth minimizing these two statistical methods is an important indication of the relevance of Geographically Weighted Regression modelling on the study area.
 
+# Results & Analysis
+In order to analyze our application, we selected some of the pre-loaded datasets to view the results. The features used are:\
+1. MRT\
+2. Primary Schools\
+3. Supermarkets\
+4. Shopping Malls\
 
-  
+The radius for the features selected above was set to 500m within the vicinity of the HDB resale flats as seen in figure 8.\
+
+![Figure 8 - Feature Settings: Selection of features and radius](app1.png)\
+
+Using a sample size of 200, Exploratory Data Analysis(EDA) is carried out in which the Histograms and Boxplots were plotted out to show the trend of resale flat prices. Figures 9 and 10 are examples of the histogram and boxplot generated from the application. \
+
+![Figure 9 - EDA : Example of histogram plotted](histogram.png)\
+
+![Figure 10 - EDA : Example of boxplot plotted](boxplot.png)\
+
+Moving on, the correlation plot is then generated in the GWR Modelling tab as seen in figure 11 and this allows us to identify which variables should be included as the independent variable. The fixed dependent variable (y) was set to be Resale Price and with reference to the correlation plot the independent variable picked was:\
+•	 Floor_area_sqm\
+•	Flat Type\
+• MRT\
+• Primary School\
+• Supermarket\
+• Shopping Mall\
+The bandwidth selected for GWR modeling was both the fixed and adaptive bandwidth in which auto fixed bandwidth was set for the fixed bandwidth. The kernel type selected was the default Gaussian setting as seen in figure 11.\
+
+![Figure 11 - GWR Modelling Settings](setting.png)\
+
+Next, Spatial Autocorrelation amongst the residuals are tested usng Global Moran's I and the map is generated to view if there is clustering or random distribution.\ 
+
+![Figure 12 - Spatial Autocorrelation](sa.png)\
+
+since the p-value of 1.807e-06 generated from the Global Moran's I test is smaller than alpha value of 0.05 and observed Global Moran I greater than 0, residuals resemble cluster distribution.
+Having selected both fixed bandwidth and adaptive bandwidth, the results generated was as follow:\
+
+![Figure 13 - Results Generated](Results.png)\
+
+Looking at the table above, the results generated shows that the adjusted r-square of the GWR for both fixed and adaptive bandwidth is of a greater value than the global multiple linear regression model hence this shows that the GWR model is a better model to use in predicting housing prices. Furthermore the value of AIC is lower for the GWR model thus further supports the fact that the GWR is a superior model compared to global regression. 
+
+![Figure 14 - Fixed Bandwidth GWR Map](fixed.png)\
+
+![Figure 15 - Adaptive Bandwidth GWR Map](results2.png)\
+
+
+
+
+
+
+
+
 
 
 
