@@ -195,8 +195,12 @@ Looking at the table above, the results generated shows that the adjusted r-squa
 
 
 
+# Discussion
 
 
+# Future Work 
+
+The GWR model provides new insights on whether spatial attributes affects the HDB resale flat prices and it is a superior model as compared to global regression model however, our application could be modified further to allow for users to input dataset of their choice instead of providing a fixed list of attributes this is because the default list of spatial attributes limits the ability of users to explore other attributes that might be newly developed by the government as part of urabn redevelopment plans of the government. Furthermore, the application can be made global such that people from other regions are able to also use the application for GWR modeling purposes, the application could be configured to handle different CRS settings set by the user. By doing so, it increases the functionality and reaches out to a greater pool of users. Lastly, more modeling and plot options could be given for exploratory data analysis to allow for more in-depth comparison and understanding of the spatial features present in the different locations. Other plot options that could be provided for analysis are Boxmaps, isoline maps or chloropleth maps. 
 
 
 
