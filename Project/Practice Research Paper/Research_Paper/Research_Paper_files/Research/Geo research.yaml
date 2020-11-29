@@ -1,0 +1,241 @@
+---
+references:
+- id: ''
+  type: book
+  abstract: >-
+    In Singapore, the public resale housing market is an active second-hand
+    housing market, whereby previously subsidised new public housing units were
+    being transacted at market prices. In contrast to the private housing price
+    determinants that have been identified in the international literature, the
+    prices of public resale housing in Singapore are largely determined by
+    public policies rather than by economic variables. This paper provides some
+    empirical evidence on how and to what degree public housing policies
+    affected the price dynamics of public resale housing in Singapore during the
+    1990s. The findings have additional implications of the wider consequences
+    of public policies on the prices of private housing units.
+  source: CiteSeer
+  title: Prices in Singapore
+  author:
+    - family: Tu
+      given: Yong
+    - family: Wong
+      given: Grace K. M.
+
+- id: ''
+  type: webpage
+  title: IMF Global Housing Watch
+  URL: 'https://www.imf.org/external/research/housing/'
+  accessed:
+    - year: 2020
+      month: 11
+      day: 25
+
+- id: ''
+  type: article-journal
+  abstract: >-
+    In recent decades, modeling house prices has become a hot topic among
+    economists, planners, and policymakers due to the significant role of
+    properties in household wealth and national economy. As many existing
+    hedonic pricing models fail to take into account the effect of local spatial
+    variations on the housing prices, there has been an increasing interest in
+    using spatial econometrics, specifically geographically weighted regression
+    (GWR) to more accurately model housing prices. However, with many different
+    existing GWR models, it is not very easy for the casual users to use one for
+    analysis. Addressing this need, we designed and developed EzModel, a dynamic
+    and interactive GWR modelling tool to help economists, planners,
+    policymakers to explore and analyse how variations of features in the local
+    surroundings, such as number of MRT/LRT stations around a HDB unit, may
+    affect housing prices. As there may be certain factors that should be more
+    accurately modelled as global factors, our tool also allows users to easily
+    switch to a mixed geographically weighted regression (MGWR) model to model
+    both local and global variables. The potential of EzModel is demonstrated
+    through the use of robust GWR modeling options as well as interactive
+    isoline maps to analyse the effects of local spatial variations on
+    Singapore’s Housing Development Board (HDB) Flat resale prices.
+  language: en
+  page: '12'
+  source: Zotero
+  title: >-
+    EzModel: An Interactive Tool to Model HDB Resale Prices using Mixed
+    Geographically Weighted Regression
+  author:
+    - family: Chin
+      given: Daniel
+    - family: Lim
+      given: Patrick
+    - family: Shi
+      given: Jianrong
+
+- id: ''
+  type: article-journal
+  abstract: >-
+    In recent decades, modeling house prices has become a hot topic among
+    economists, planners, and policymakers due to the significant role of
+    properties in household wealth and national economy. As many existing
+    hedonic pricing models fail to take into account the effect of local spatial
+    variations on the housing prices, there has been an increasing interest in
+    using spatial econometrics, specifically geographically weighted regression
+    (GWR) to more accurately model housing prices. However, with many different
+    existing GWR models, it is not very easy for the casual users to use one for
+    analysis. Addressing this need, we designed and developed EzModel, a dynamic
+    and interactive GWR modelling tool to help economists, planners,
+    policymakers to explore and analyse how variations of features in the local
+    surroundings, such as number of MRT/LRT stations around a HDB unit, may
+    affect housing prices. As there may be certain factors that should be more
+    accurately modelled as global factors, our tool also allows users to easily
+    switch to a mixed geographically weighted regression (MGWR) model to model
+    both local and global variables. The potential of EzModel is demonstrated
+    through the use of robust GWR modeling options as well as interactive
+    isoline maps to analyse the effects of local spatial variations on
+    Singapore’s Housing Development Board (HDB) Flat resale prices.
+  language: en
+  page: '12'
+  source: Zotero
+  title: >-
+    EzModel: An Interactive Tool to Model HDB Resale Prices using Mixed
+    Geographically Weighted Regression
+  author:
+    - family: Chin
+      given: Daniel
+    - family: Lim
+      given: Patrick
+    - family: Shi
+      given: Jianrong
+
+- id: ''
+  type: webpage
+  title: ISSS608G11_SGSAS_ResearchPaper.pdf
+  URL: >-
+    https://wiki.smu.edu.sg/1920t2isss608/img_auth.php/6/66/ISSS608G11_SGSAS_ResearchPaper.pdf
+  author:
+    - family: Li Junyi
+      given: Darren
+    - family: Muhammad
+      given: Jufri Bin Ramli
+    - family: Teo
+      given: Raymond
+  accessed:
+    - year: 2020
+      month: 11
+      day: 26
+
+- id: ''
+  type: article-journal
+  abstract: >-
+    The technique of geographically weighted regression (GWR) is used to model
+    spatial ‘drift’ in linear model coefficients. In this paper we extend the
+    ideas of GWR in a number of ways. First, we introduce a set of analytically
+    derived significance tests allowing a null hypothesis of no spatial
+    parameter drift to be investigated. Second, we discuss ‘mixed’ GWR models
+    where some parameters are fixed globally but others vary geographically.
+    Again, models of this type may be assessed using significance tests.
+    Finally, we consider a means of deciding the degree of parameter smoothing
+    used in GWR based on the Mallows Cp statistic. To complete the paper, we
+    analyze an example data set based on house prices in Kent in the U.K. using
+    the techniques introduced.
+  container-title: Journal of Regional Science
+  DOI: 'https://doi.org/10.1111/0022-4146.00146'
+  ISSN: 1467-9787
+  issue: '3'
+  language: en
+  note: '_eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1111/0022-4146.00146'
+  page: 497-524
+  source: Wiley Online Library
+  title: >-
+    Some Notes on Parametric Significance Tests for Geographically Weighted
+    Regression
+  URL: 'http://onlinelibrary.wiley.com/doi/abs/10.1111/0022-4146.00146'
+  volume: '39'
+  author:
+    - family: Brunsdon
+      given: Chris
+    - family: Fotheringham
+      given: A. Stewart
+    - family: Charlton
+      given: Martin
+  accessed:
+    - year: 2020
+      month: 11
+      day: 27
+  issued:
+    - year: 1999
+
+- id: ''
+  type: article-journal
+  container-title: International Journal of Geographical Information Science
+  DOI: 10.1080/13658816.2013.865739
+  ISSN: '1365-8816, 1362-3087'
+  issue: '4'
+  language: en
+  page: 660-681
+  source: DOI.org (Crossref)
+  title: >-
+    Geographically weighted regression with a non-Euclidean distance metric: a
+    case study using hedonic house price data
+  URL: 'http://www.tandfonline.com/doi/abs/10.1080/13658816.2013.865739'
+  volume: '28'
+  author:
+    - family: Lu
+      given: Binbin
+    - family: Charlton
+      given: Martin
+    - family: Harris
+      given: Paul
+    - family: Fotheringham
+      given: A. Stewart
+  accessed:
+    - year: 2020
+      month: 11
+      day: 27
+  issued:
+    - year: 2014
+      month: 4
+      day: 3
+  shortTitle: Geographically weighted regression with a non-Euclidean distance metric
+  container-title-short: International Journal of Geographical Information Science
+
+- id: ''
+  type: article-journal
+  abstract: >-
+    Geographically Weighted Regression (GWR) was developed in response to the
+    ﬁnding that a regression model estimated over the entire area of interest
+    may not adequately address local variations. The fairly simple principle on
+    which it is based consists on estimating local models by least squares, each
+    observation being weighted by a decreasing function of its distance to the
+    estimation point. Combining these local models makes it possible to build a
+    global model with speciﬁc properties. GWR can be used, in particular with
+    the help of associated cartographic representations, to identify where local
+    coefﬁcients deviate the most from the overall coefﬁcients, to build tests to
+    assess whether the phenomenon is non-stationary and to characterise
+    non-stationary. The method is presented using the example of a hedonic
+    pricing model – prices of existing housing in Lyon. We show how to optimally
+    determine the radius of the disk on which local regressions will be
+    performed and we present the estimation results, the robust estimation
+    methods and the tests of coefﬁcients’ non stationarity. In addition to this
+    descriptive use, we present a more predictive approach, showing how taking
+    non-stationarity into account makes it possible to improve an estimator over
+    a spatial area. The example is based on a model linking the poor population
+    and the number of beneﬁciaries of supplementary universal health coverage
+    (CMU-C) in Rennes.
+  language: en
+  page: '24'
+  source: Zotero
+  title: 9. Geographically Weighted Regression
+  author:
+    - family: Bellefon
+      given: Marie-Pierre De
+    - family: Floch
+      given: Jean-Michel
+
+- id: ''
+  type: webpage
+  title: >-
+    000851: Use the Spatial Autocorrelation (Moran's I) Tool to ensure residuals
+    are not spatially autocorrelated.—ArcGIS Pro | Documentation
+  URL: >-
+    https://pro.arcgis.com/en/pro-app/tool-reference/tool-errors-and-warnings/001001-010000/tool-errors-and-warnings-00851-00875-000851.htm
+  accessed:
+    - year: 2020
+      month: 11
+      day: 27
+...
