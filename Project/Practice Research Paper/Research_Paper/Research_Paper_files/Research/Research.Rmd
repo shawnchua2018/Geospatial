@@ -15,13 +15,10 @@ author:
       | School Of Social Sciences
       | Singapore Management University (SMU)
 
-keywords: 
-  - Geographically Weighted Regression
-  - Geospatial Analytics
-  - Singapore HDB Resale Prices]
-
 abstract: |
   Valuing housing prices has seen a surge in popularity over the years amongst policy planners and economist due to the significant impact that properties have on the economy and society. The current hedonic pricing models used in the market fails to take into account the effect of local spatial features on the housing prices which however there has been increasing interest and studies carried out on Geographically Weighted Regression (GWR) model, a more precise regression model to stimulate the spatial distribution of housing prices. There are several GWR models available which poses a challenge to casual users who would like to conduct a simple and understandable analysis of the spatial distribution of housing prices. Therefore to address this issue, we developed $patial, an interactive and accessible application with an user friendly interface to aid economists and policy planners to effortlessly explore how variations of spatial features such as number of shopping malls surrounding the housing estate in different locations affects the price of the housing flats.
+  
+  **Keywords**: Geographically Weighted Regression, Geospatial Analytics, Singapore HDB Resale Prices
 
 csl: acm-sig-proceedings.csl
 
@@ -31,6 +28,7 @@ output:
 
 
 ---
+
 
 
 
@@ -188,7 +186,7 @@ Therefore, the value of bandwidth minimizing these two statistical methods is an
 #### 4.2.2.2 __Spatial Autocorrelation of Residuals__
 
 Another method used in the $patial application to ensure that the results obtained from GWR analysis is accurate is through the testing of spatial autocorrelation amongst the regression residuals. 
-The test for spatial correlation amongst residuals is done using the Global Moran’s I to obtain the p-value in order for comparison with the alpha value which test for statistical significance and in turn  determines if the residuals tend towards clustering or not.   
+The is done by plotting the residuals from the Hedonic Pricing Model and seeing if there are signs of spatial autocorrelation. A Global Moran I test is then done to check if for clustering by obtaining the p-value for comparison with the alpha value which test for statistical significance and in turn  determines if the residuals tend towards clustering or not.   
 
 
 # Results & Analysis
