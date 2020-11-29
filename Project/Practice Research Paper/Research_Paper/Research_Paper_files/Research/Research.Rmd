@@ -91,7 +91,8 @@ The following section reveals the techniques and algorithms used in the process 
 ## Application Architecture
 
 The application was developed using Shiny, an R program package. R shiny is a simple package that is used to build interactive web applications and dashboards. It runs on a Shiny server hosted by Shinyapps.io , the datasets mentioned in Section 3.1 are imported and stored in the server. At the backend, the CSV and Shapefile datasets are cleaned and used for geocoding, projection and GWR. Whenever the application runs the datasets are automatically loaded for use. The interactive maps featured in the application calls on the Leaflet package for it to be displayed.\
-\begin{figure}[h]
+
+\begin{figure}[H]
 \centering
 \includegraphics[width=8cm]{App Archite.png}
 \caption{Application Architecture Diagram}\label{fig1}
@@ -105,7 +106,7 @@ The application was developed using Shiny, an R program package. R shiny is a si
 The following R Packages are used in the
 development of the $patial Application:\
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[width=8cm]{Table.png}
 \end{figure}
