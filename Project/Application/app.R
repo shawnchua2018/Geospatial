@@ -1,16 +1,29 @@
-
+library(sp)
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(DT)
-
-packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster','plotly', 'leaflet', 'tmaptools', 'shinyBS')
-for (p in packages){
-  if(!require(p, character.only = T)){
-    install.packages(p)
-  }
-  library(p,character.only = T)
-}
+library(rgdal)
+library(rgeos)
+library(sf)
+library(tidyverse)
+library(olsrr)
+library(corrplot)
+library(ggpubr)
+library(spdep)
+library(GWmodel)
+library(tmap)
+library(raster)
+library(plotly)
+library(leaflet)
+library(tmaptools)
+#packages = c('shiny', 'sp', 'rgdal', 'rgeos', 'sf', 'tidyverse', 'olsrr', 'corrplot', 'ggpubr', 'sf', 'spdep', 'GWmodel', 'tmap', 'tidyverse', 'raster','plotly', 'leaflet', 'tmaptools')
+#for (p in packages){
+#  if(!require(p, character.only = T)){
+#    install.packages(p)
+#  }
+#  library(p,character.only = T)
+#}
 
 # Importing Datasets
 resale_flat = st_read("data/aspatial/Resale_flats_compiled.csv")
