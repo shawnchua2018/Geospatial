@@ -230,7 +230,7 @@ Moving on, the correlation plot is then generated in the GWR Modelling tab as se
 • Supermarket\
 • Shopping Mall\
 
-The bandwidth selected for GWR modeling was both the fixed and adaptive bandwidth in which auto fixed bandwidth was set for the fixed bandwidth. The kernel type selected was the default Gaussian setting as seen in figure 11.\
+The bandwidth selected for GWR modeling was the auto fixed bandwidth and fixed kernel type was selected and was the default Gaussian kernel was chosen as seen in figure 11.\
 
 \begin{figure}[H]
 \centering
@@ -238,7 +238,7 @@ The bandwidth selected for GWR modeling was both the fixed and adaptive bandwidt
 \caption{GWR Modelling Settings}\label{fig11}
 \end{figure}\
 
-Next, Spatial Autocorrelation amongst the residuals are tested usng Global Moran's I and the map is generated to view if there is clustering or random distribution.\ 
+Next, Spatial Auto correlation among the residuals are tested using Global Moran's I and the map is generated to view if there is clustering or random distribution.\ 
 
 \begin{figure}[H]
 \centering
@@ -255,7 +255,7 @@ Having selected both fixed bandwidth and adaptive bandwidth, the results generat
 \caption{Results Generated}\label{fig13}
 \end{figure}\
 
-Looking at the table in figure 13, the results generated shows that the adjusted r-square of the GWR for both fixed and adaptive bandwidth is of a greater value than the global multiple linear regression model hence this shows that the GWR model is a better model to use in predicting resale flat prices where GWR can predict resale flat prices at 99.1% and 76.8% respectively using fixed and adaptive bandwidth. Furthermore the value of AIC is lower for the GWR model thus further supports the fact that the GWR is a superior model compared to global regression to use when predicting resale flat prices. 
+Looking at the table in figure 13, the results generated shows that the adjusted r-square of the GWR for both fixed and adaptive kernel is of a greater value than the global multiple linear regression model hence this shows that the GWR model is a better model to use in predicting resale flat prices where GWR can predict resale flat prices at 91.1% and 76.8% respectively using fixed and adaptive kernel. Furthermore the value of AIC is lower for the GWR model thus further supports the fact that the GWR is a superior model compared to global regression to use when predicting resale flat prices. 
 
 \begin{figure}[H]
 \centering
