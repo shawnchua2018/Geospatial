@@ -47,7 +47,7 @@ This research paper documents the research and methods used in the process of im
 
 The development of $patial is inspired by two published papers. 
 
-The first paper being EzModel (Chin et al., n.d.) where two models, GWR and mixed (semiparametric) GWR is used in the analysis of the datasets and the second paper being Simple Geo-Spatial Analysis using R-shiny (li et al., n.d.). The GWR model used in both papers is a local statistical technique that takes into account the spatial non-stationary objects via the coefficients obtained from each variable fore each resulting observation in the regression model. The GWR model used is calibrated in three steps, firstly a total of five different kernel functions to calibrate the parameters before running the GWR, the five kernels used are Gaussian, Exponential, Box-car, Bi-Square and Tri-cube which are categorized into continuous and discontinuous kernels in order to determine the allocation of weights to observations. Secondly, fixed and adaptive weighting scheme which affects the third parameter bandwidth is calibrated where users are allowed to choose if they would want to make use of the fixed or adaptive weighting scheme to choose determine the bandwidth applied to the observations. Lastly, in determining bandwidth, two other statistical methods- Cross-Validation score and Akaike Information Criterion is used. EzModel includes a second model in its paper known as the mixed GWR model which allows for analysis of global and local variables where the global variables are fixed as independent variables and the local variables as dependent variables. 
+The first paper being EzModel (Chin et al., n.d.) where two models, GWR and mixed (semiparametric) GWR is used in the analysis of the datasets and the second paper being Simple Geo-Spatial Analysis using R-shiny (li et al., n.d.). The GWR model used in both papers is a local statistical technique that takes into account the spatial non-stationary objects via the coefficients obtained from each variable fore each resulting observation in the regression model. The GWR model used is calibrated in three steps, firstly a total of five different kernel functions to calibrate the parameters before running the GWR, the five kernels used are Gaussian, Exponential, Box-car, Bi-Square and Tri-cube which are categorized into continuous and discontinuous kernels in order to determine the allocation of weights to observations. Secondly, fixed and adaptive weighting scheme which affects the third parameter bandwidth is calibrated where users are allowed to choose if they would want to make use of the fixed or adaptive weighting scheme to determine the bandwidth applied to the observations. Lastly, to determinine optimal bandwidth, two other statistical methods- Cross-Validation score and Akaike Information Criterion is used. EzModel includes a second model in its paper known as the mixed GWR model which allows for analysis of global and local variables where the global variables are fixed as independent variables and the local variables as dependent variables. 
 
 
 
@@ -77,6 +77,8 @@ The rest of the datasets are obtained from data.gov.sg.
 
 ## Data Preparation
 
+HDB Flat Resale Prices Dataset have been filtered to obtain only recent data in the year of 2020. Address data in this dataset that was initially written in short-forms have been editted and spelled out completely.
+
 The datasets identified above came in different file types containing differing data types, some processing must be done for all the imported data to be integrated into the analysis. 
 
 The school dataset we obtained contains all schools ranging from primary to tertiary education (specifically junior colleges), therefore we decided to extract data only for primary and secondary schools and keep them as separate datasets for further analysis. Primary and Secondary schools are being focused on for the purpose of this study as we felt that, homeowners will be more concerned for the distance of primary and secondary schools seeing those that attend them are of the younger age group and parents may not want them to travel far.
@@ -104,7 +106,7 @@ The application was developed using Shiny, an R program package. R shiny is a si
 ### R Packages
 
 The following R Packages are used in the
-development of the EzModel Application:\
+development of the $patial Application:\
 
 \begin{figure}[h]
 \centering
@@ -143,7 +145,6 @@ The GWR has to be calibrated before it can be used for processing. To calibrate 
 
 The weighting kernels functions are classified into two categories – Continuous and Discontinuous kernels. 
 Continuous kernels are Gaussian and Exponential kernels where the kernels weight all the observations with a weight that tends towards zero but never produces a zero value (Bellefon & Floch, n.d.).\
-
 
 \begin{figure}[H]
 \centering

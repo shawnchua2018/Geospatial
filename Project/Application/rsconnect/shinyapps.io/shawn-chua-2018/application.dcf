@@ -5,6 +5,8 @@ account: shawn-chua-2018
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3317378
-bundleId: 3917601
+bundleId: 3918273
 url: https://shawn-chua-2018.shinyapps.io/application/
-when: 1606614625.74592
+when: 1606634909.16228
+asMultiple: FALSE
+asStatic: FALSE

@@ -486,19 +486,19 @@ body <- dashboardBody(tabItems(
                                
                                #actionButton("go", "Go"),
                                
-                               h3("Bandwidth Selection for GWR modelling"),
-                               materialSwitch(inputId = "fix", label = strong("Fixed Bandwidth"), status = "danger"),
+                               h3("Bandwidth and Kernel Selection for GWR modelling"),
+                               materialSwitch(inputId = "fix", label = strong("Bandwidth Selection"), status = "danger", value= TRUE),
                                #checkboxInput(inputId = "auto", label = "Auto Fixed Bandwidth", value= FALSE),
                                conditionalPanel(condition = "input.fix == true",
                                                 checkboxInput(inputId = "auto", label = "Auto Fixed Bandwidth", value= FALSE),
                                                 conditionalPanel(condition = "input.auto == false",
-                                                                 numericInput("bandwidth", "Manual Input Fixed Bandwidth: ", 1000,
+                                                                 numericInput("bandwidth", "Manual Fixed Bandwidth: ", 1000,
                                                                               min = NA,
                                                                               max = NA,
                                                                               step = 100,
                                                                               width = NULL))),
                                #checkboxInput(inputId = "kadapt", label = "Adaptive Bandwidth", value= FALSE),
-                               materialSwitch(inputId = "kadapt", label = strong("Adaptive Bandwidth"), status = "danger"), 
+                               materialSwitch(inputId = "kadapt", label = strong("Adaptive Kernel"), status = "danger"), 
                                h3("Kernel Selection"), 
                                selectInput(inputId = "kernel", label = "Select Kernel type: ", 
                                            choices = c("Gaussian", "Exponential", "Bi-square", "Tricube", "Boxcar")),
@@ -516,11 +516,11 @@ body <- dashboardBody(tabItems(
                                verbatimTextOutput("morani")
                                ),
                       
-                      tabPanel("Fixed Bandwidth GWR", icon = icon("ruler"),
+                      tabPanel("Fixed Kernel GWR", icon = icon("ruler"),
                                tabsetPanel(tabPanel("GWR Map", icon= icon("map"),
                                                     #actionButton("plot", "Plot map"),
                                                     conditionalPanel(condition = "input.fix == false",
-                                                    p("Please check the Fixed Bandwidth option to see plot on this page", style='color:red')),
+                                                    p("Please check the Bandwidth option to see plot on this page", style='color:red')),
                                                     
                                                     conditionalPanel(#condition = "input.plot == true",
                                                                      condition = "input.fix == true",
@@ -530,13 +530,13 @@ body <- dashboardBody(tabItems(
                                                                      tmapOutput("fixed_plot1", height=600))),
                                            tabPanel("GWR Data Output", icon= icon("file-excel"),
                                                     conditionalPanel(condition = "input.fix == false",
-                                                                     p("Please check the Fixed Bandwidth option to see plot on this page", style='color:red')),
+                                                                     p("Please check the Bandwidth option to see plot on this page", style='color:red')),
                                                     conditionalPanel(condition = "input.fix == true",
                                            verbatimTextOutput("fixsum"))))), 
-                      tabPanel("Adaptive Bandwidth GWR",icon = icon("ruler"),
+                      tabPanel("Adaptive Kernel GWR",icon = icon("ruler"),
                                tabsetPanel(tabPanel("GWR Map", icon= icon("map"),
                                                     conditionalPanel(condition = "input.kadapt == false",
-                                                                     p("Please check the Adaptive Bandwidth option to see plot on this page", style='color:red')),
+                                                                     p("Please check the Adaptive Kernel option to see plot on this page", style='color:red')),
                                                     conditionalPanel(condition = "input.kadapt == true",
                                                                      p("Plot takes a moment to load"),
                                                                      p("Data points can be clicked for more information"),
@@ -544,7 +544,7 @@ body <- dashboardBody(tabItems(
                                                                      tmapOutput("adapt_plot1", height=600))),
                                            tabPanel("GWR Data Output", icon = icon("file-excel"),
                                                     conditionalPanel(condition = "input.kadapt == false",
-                                                                     p("Please check the Adaptive Bandwidth option to see plot on this page", style='color:red')),
+                                                                     p("Please check the Adaptive Kernel option to see plot on this page", style='color:red')),
                                                     conditionalPanel(condition = "input.kadapt == true",
                                            verbatimTextOutput("adaptsum")))))
                                
@@ -963,7 +963,13 @@ server <- function(input, output) {
       #GwrFormula <- as.formula(paste('resale_price',paste(mylist, collapse="+"), sep="~"))
       bw.adaptive <- bw.gwr(formula=GwrFormula, data=sp_resale_flat, approach="CV", kernel=kernel, adaptive=TRUE, longlat=FALSE)
       set.seed(0)
-      gwr.adaptive <- gwr.basic(formula = GwrFormula, data=sp_resale_flat, bw=bw.adaptive, kernel = kernel, adaptive=TRUE, longlat = FALSE)
+      if (input$auto == "TRUE"){
+        gwr.adaptive <- gwr.basic(formula = GwrFormula, data=sp_resale_flat, bw=bw.adaptive, kernel = kernel, adaptive=TRUE, longlat = FALSE)
+      } 
+      else {
+        gwr.adaptive <- gwr.basic(formula = GwrFormula, data=sp_resale_flat, bw=input$bandwidth, kernel = kernel, adaptive=TRUE, longlat = FALSE)
+      }
+      
     })
     
     
