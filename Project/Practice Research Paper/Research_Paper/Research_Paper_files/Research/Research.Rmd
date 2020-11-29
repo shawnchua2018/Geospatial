@@ -23,10 +23,9 @@ keywords:
 abstract: |
   Valuing housing prices has seen a surge in popularity over the years amongst policy planners and economist due to the significant impact that properties have on the economy and society. The current hedonic pricing models used in the market fails to take into account the effect of local spatial features on the housing prices which however there has been increasing interest and studies carried out on Geographically Weighted Regression (GWR) model, a more precise regression model to stimulate the spatial distribution of housing prices. There are several GWR models available which poses a challenge to casual users who would like to conduct a simple and understandable analysis of the spatial distribution of housing prices. Therefore to address this issue, we developed $patial, an interactive and accessible application with an user friendly interface to aid economists and policy planners to effortlessly explore how variations of spatial features such as number of shopping malls surrounding the housing estate in different locations affects the price of the housing flats.
 
-bibliography: sigproc.bib
 csl: acm-sig-proceedings.csl
 output: 
-  rticles::acm_article: 
+  rticles::acm_article:
     extra_dependencies: ["float"]
 
 
@@ -99,23 +98,25 @@ The application was developed using Shiny, an R program package. R shiny is a si
 The following R Packages are used in the
 development of the EzModel Application:\
 
-![](Table.png)\
+\begin{figure}[h]
+\centering
+\includegraphics[width=8cm]{Table.png}
+\end{figure}
+
 
 
 ### Algorithms 
-4.2.2.1 __Geographically Weighted Regression__ 
+#### 4.2.2.1 __Geographically Weighted Regression__ 
 
 $patial makes use of the GWR model, a local statistical technique to analyze spatial variations in relationships where spatial non-stationary is assumed and tested by looking at the coefficients of the variables for each observation in the regression models. The GWR model is based on the “First law of Geography” where everything is related with everything else, but closer things are more related than remote ones and the resulting mathematical equation is expressed as such:\
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=8cm]{Eqn 1.png}
-\caption{Application Architecture Diagram}\label{fig2}
+\caption{GWR Equation}\label{fig2}
 \end{figure}\
-
-eqn represents the value of the output variable at the coordinate location i , eqn  denotes the coordinates of the i-th point in space and EQN is a realization of the continuous functions at point i (Brunsdon et al., 1999). 
+ 
 The values used in the formula depends on the location and surrounding of the observations with reference to its spatial context. In general, GWR measures the inherent relationships around each regression point i, each set of regression coefficient is estimated by weighted least squares (Lu et al., 2014). 
-
 
 The GWR has to be calibrated before it can be used for processing. To calibrate the formula, firstly we need to distinguish between the different weighting kernel functions listed below:\
 1.	Gaussian\
@@ -124,116 +125,197 @@ The GWR has to be calibrated before it can be used for processing. To calibrate 
 4.	Bi-square\
 5.	Tri-cube\
 
-![Figure 3 - Plots showing the different weighting kernel functions](function.png)\
+<center>
+
+![Plots showing the different weighting kernel functions](function.png)
+
+</center>
 
 The weighting kernels functions are classified into two categories – Continuous and Discontinuous kernels. 
 Continuous kernels are Gaussian and Exponential kernels where the kernels weight all the observations with a weight that tends towards zero but never produces a zero value (Bellefon & Floch, n.d.).\
 
-![Figure 4 -Formula of Continuous Kernels](continuous.png)\
+<center>
 
-The kernels that fall into the discontinuous categories are Box-car, Bi-square and Tri-cube. The Box-Car kernel handles a continuous observation in a discontinuous method and Bi-square, Tri-cube kernels produce observations that are of decreasing weight with increasing distance however the weight gives a zero value beyond the specified distance b called bandwidth as seen in figure 5 shown below.\
+![Formula of Continuous Kernels](continuous.png)
 
-![Figure 5 - Formula of Discontinuous Kernels](discontinuous.png)\
+</center>
+
+The kernels that fall into the discontinuous categories are Box-car, Bi-square and Tri-cube. The Box-Car kernel handles a continuous observation in a discontinuous method and Bi-square, Tri-cube kernels produce observations that are of decreasing weight with increasing distance however the weight gives a zero value beyond the specified distance h called bandwidth as seen in figure 5.\
+
+<center>
+
+![Formula of discontinuous Kernels](discontinuous.png)
+
+</center>
 
 Secondly, there is a need to determine fixed kernel versus adaptive kernel. 
 Fixed Kernel represents the extent of the kernel that is determined by the distance to the point of interest which is fixed and hence the kernel would appear the same  at any location (Bellefon & Floch, n.d.). Additionally, a fixed kernel causes the regression to vary significantly as in low-density areas, if the fixed kernel is too small the number of points that is used in regression would be too little whereas if the area is dense a fixed kernel that is too large would overlook the variations in the area. Hence another alternative would be the adaptive kernel which represents the extent of the kernel that is determined by the number of neighbors that the point of interest has which varies according to the bandwidth adjusted according to the context of the observation in which the bandwidth increases and decreases following the density of the data points. 
 Lastly, there is a need to calibrate the choice of bandwidth used in the GWR model as the bandwidth chosen affects the results produced. Aside from allowing users to input the pre-defined bandwidth of their choice, there exists two other statistical methods which can assist in choosing the most suitable bandwidth. 
 Firstly, the cross-validation criteria given by the formula as shown in figure 6.\
-![Figure 6 - Formula of cross-validation criteria](cv.png)\
+
+<center>
+
+![Formula of Cross-Validation Criteria](cv.png)
+
+</center>
 
 CV represents the cross-validation score and h  represents the bandwidth. If bandwidth h, minimizes the cross-validation score it is the most suitable bandwidth value as it maximizes the GWR model’s predictive power (Bellefon & Floch, n.d.). 
-
 Secondly, the adjusted akaike criterion given by the formula as shown in figure 7.\
-![Figure 7 - Formula of Adjusted Akaike Criterion](aac.png)\
+
+<center>
+
+![Formula of Adjusted Akaike Criterion](aac.png)
+
+</center>
 
 n represents the sample size which and h represents the bandwidth. The AIC criterion generally prefers larger bandwidth values as compared to the cross-validation criterion. 
-Therefore, the value of bandwidth minimizing these two statistical methods is an important indication of the relevance of Geographically Weighted Regression modelling on the study area.
+Therefore, the value of bandwidth minimizing these two statistical methods is an important indication of the relevance of Geographically Weighted Regression modeling on the study area.
+
+#### 4.2.2.2 __Spatial Autocorrelation of Residuals__
+Another method used in the $patial application to ensure that the results obtained from GWR analysis is accurate is through the testing of spatial autocorrelation amongst the regression residuals. 
+The test for spatial correlation amongst residuals is done using the Global Moran’s I to obtain the p-value in order for comparison with the alpha value which test for statistical significance and in turn  determines if the residuals tend towards clustering or not.   
+
 
 # Results & Analysis
-In order to analyze our application, we selected some of the pre-loaded datasets to view the results. The features used are:\
+## Case 1: Analyze performance of GWR Model
+In order to analyze the performance of the GWR model, we selected some of the pre-loaded datasets to view the results. The features used are:\
 1. MRT\
 2. Primary Schools\
 3. Supermarkets\
 4. Shopping Malls\
 
-The radius for the features selected above was set to 500m within the vicinity of the HDB resale flats as seen in figure 8.\
+The radius for the features selected above was set to 500m within the vicinity of the HDB resale flats as seen in figure 8.
+<center>
 
-![Figure 8 - Feature Settings: Selection of features and radius](app1.png)\
+![Feature Settings: Selection of features and radius](app1.png)
 
-Using a sample size of 200, Exploratory Data Analysis(EDA) is carried out in which the Histograms and Boxplots were plotted out to show the trend of resale flat prices. Figures 9 and 10 are examples of the histogram and boxplot generated from the application. \
+</center>
+Using a sample size of 200, Exploratory Data Analysis(EDA) is carried out in which the Histograms and Boxplots were plotted out to show the trend of resale flat prices and count of features within the chosen radius of 500m . Figures 9 and 10 are examples of the histogram and boxplot generated from the application. \
+<center>
 
-![Figure 9 - EDA : Example of histogram plotted](histogram.png)\
+![EDA : Example of histogram plotted](histogram.png)
 
-![Figure 10 - EDA : Example of boxplot plotted](boxplot.png)\
+</center>
 
+<center>
+
+![EDA : Example of boxplot plotted](boxplot.png)
+
+</center>
 Moving on, the correlation plot is then generated in the GWR Modelling tab as seen in figure 11 and this allows us to identify which variables should be included as the independent variable. The fixed dependent variable (y) was set to be Resale Price and with reference to the correlation plot the independent variable picked was:\
-•	 Floor_area_sqm\
+•	Floor_area_sqm\
 •	Flat Type\
 • MRT\
 • Primary School\
 • Supermarket\
 • Shopping Mall\
-The bandwidth selected for GWR modeling was both the fixed and adaptive bandwidth in which auto fixed bandwidth was set for the fixed bandwidth. The kernel type selected was the default Gaussian setting as seen in figure 11.\
 
-![Figure 11 - GWR Modelling Settings](setting.png)\
+The bandwidth selected for GWR modeling was both the fixed and adaptive bandwidth in which auto fixed bandwidth was set for the fixed bandwidth. The kernel type selected was the default Gaussian setting as seen in figure 11.\
+<center>
+
+![GWR Modelling Settings](setting.png)
+
+</center>
 
 Next, Spatial Autocorrelation amongst the residuals are tested usng Global Moran's I and the map is generated to view if there is clustering or random distribution.\ 
 
-![Figure 12 - Spatial Autocorrelation](sa.png)\
+<center>
+
+![Spatial Autocorrelation](sa.png)
+
+</center>
 
 since the p-value of 1.807e-06 generated from the Global Moran's I test is smaller than alpha value of 0.05 and observed Global Moran I greater than 0, residuals resemble cluster distribution.
 Having selected both fixed bandwidth and adaptive bandwidth, the results generated was as follow:\
 
-![Figure 13 - Results Generated](Results.png)\
+<center>
 
-Looking at the table above, the results generated shows that the adjusted r-square of the GWR for both fixed and adaptive bandwidth is of a greater value than the global multiple linear regression model hence this shows that the GWR model is a better model to use in predicting housing prices. Furthermore the value of AIC is lower for the GWR model thus further supports the fact that the GWR is a superior model compared to global regression. 
+![Results Generated](Results.png)
 
-![Figure 14 - Fixed Bandwidth GWR Map](fixed.png)\
+</center>
 
-![Figure 15 - Adaptive Bandwidth GWR Map](results2.png)\
+Looking at the table in figure 13, the results generated shows that the adjusted r-square of the GWR for both fixed and adaptive bandwidth is of a greater value than the global multiple linear regression model hence this shows that the GWR model is a better model to use in predicting resale flat prices where GWR can predict resale flat prices at 99.1% and 76.8% respectively using fixed and adaptive bandwidth. Furthermore the value of AIC is lower for the GWR model thus further supports the fact that the GWR is a superior model compared to global regression to use when predicting resale flat prices. 
+<center>
+
+![Fixed Bandwidth GWR Map](fixed.png)
+
+</center>\
+
+<center>
+
+![Adaptive Bandwidth GWR Map](results2.png)
+
+</center>\
+
+The GWR Map generated for both the fixed and adaptive bandwidth shows the distribution of Local R-square across Singapore. Local R-square values ranging between 0.0 and 1.0 indicates how well the GWR model fits the observed y values. Low values indicate that the GWR model is performing poorly and looking at the Local R-square plotted in figure 14 and 15, the GWR model generated using fixed bandwidth is a better predictor of resale flat prices than the GWR model generated using the adaptive bandwidth.
 
 
+
+
+## Case 2: Relationship between number of shopping malls in the designated proximity to resale price in areas of Bukit Batok and Punggol
+In this use case, we would like to show that the relationship between spatial features and resale price may differ depending on the area of interest. To demonstrate this, we have generated the GWR model using our application with the equation of resale price = shopping mall for the towns of Bukit Batok and Punggol.
+
+In this use case, we would like to show that the relationship between spatial features and resale price may differ depending on the area of interest. To demonstrate this, we have generated the GWR model using our application with the equation of resale price = shopping mall for the towns of Bukit Batok and Punggol.
+
+<center>
+
+![Fixed GWR map of Bukit Batok](bb.png)
+
+</center>
+
+<center>
+
+![Fixed GWR model data of Bukit Batok](bbo.png)
+
+</center>
+
+As can be seen in the figure 16, data points generally have a higher LOCAL_R2 value and from the summary data printed of the GWR, we can see that the adjusted R-square value is at 0.4340165 meaning that about 44% of the resale price in that area can be explained by the number of shopping malls in the proximity.
+
+<center>
+
+![Fixed GWR Map of Punggol](punggol.png)
+
+</center>
+
+<center>
+
+![Fixed GWR model data of Bukit Batok](po.png)
+
+</center>
+
+As can be seen in the figure 18, data points generally have a lower LOCAL_R2 value and from the summary data printed of the GWR, we can see that the adjusted R-square value is only at 0.1998738 meaning that about 19% of the resale price in that area can be explained by the number of shopping malls in the proximity.
+When comparing the results of the two towns, we can see that properties in Bukit Batok are more affected by the number of shopping malls in the proximity. Therefore, showing that relationship between resale price and spatial features may vary across different areas.
 
 
 # Discussion
+Due to the covid situation and the cancellation of the townhall presentation, we were only able to get feedback on our application through engaging our friends to try out our application. After a few rounds of testing, we were able to gather a considerable amount of feedback. The 2 most common feedback we have received involves the usage of the application. One being the general effectiveness of the application in allowing users to generate Geographically Weighted Regression Models with considerable ease and convenience where they did not need to gather the required data sets themselves and are able to quickly generate the models through a simple interface.
+Second would be that the application is easy to understand where key information is displayed accordingly and can be interpreted easily. These information would include the results of regression models and even the relationship between variables which they are able to use to further understand how resale prices of HDBs are generated and how geographical features can actually affect them both positively or negatively.\
+
+Apart from these, there are also several other valuable feedback for improvements. Firstly, some users would like to have more customisability where they could input their own datasets for modeling. This would include both the property data and the spatial features data. This is because, some users have expressed interest in using this application to analyze prices for other types of property such as industrial buildings and even office spaces.\
+
+Secondly, some users requested for more functions such as other forms of map plots that represent other information that is related to property. One suggestion to make the application more complete is to add more general plots for analysis before going into the regression model. Users have mentioned that they might want to visualize general distribution of geographical features on the map plots and density maps for property which may help them decide which areas they would want to focus on or even help them with feature selection for GWR modeling.
 
 
 # Future Work 
 
-The GWR model provides new insights on whether spatial attributes affects the HDB resale flat prices and it is a superior model as compared to global regression model however, our application could be modified further to allow for users to input dataset of their choice instead of providing a fixed list of attributes this is because the default list of spatial attributes limits the ability of users to explore other attributes that might be newly developed by the government as part of urabn redevelopment plans of the government. Furthermore, the application can be made global such that people from other regions are able to also use the application for GWR modeling purposes, the application could be configured to handle different CRS settings set by the user. By doing so, it increases the functionality and reaches out to a greater pool of users. Lastly, more modeling and plot options could be given for exploratory data analysis to allow for more in-depth comparison and understanding of the spatial features present in the different locations. Other plot options that could be provided for analysis are Boxmaps, isoline maps or chloropleth maps. 
+The GWR model provides new insights on whether spatial attributes affects the HDB resale flat prices and it is a superior model as compared to global regression model however, our application could be modified further to allow for users to input dataset of their choice instead of providing a fixed list of attributes this is because the default list of spatial attributes limits the ability of users to explore other attributes that might be newly developed by the government as part of urban redevelopment plans of the government. Furthermore, the application can be made global such that people from other regions are able to also use the application for GWR modeling purposes, the application could be configured to handle different CRS settings set by the user. By doing so, it increases the functionality and reaches out to a greater pool of users. Lastly, more modeling and plot options could be given for exploratory data analysis to allow for more in-depth comparison and understanding of the spatial features present in the different locations. Other plot options that could be provided for analysis are Boxmaps, Isoline maps or Chloropleth maps. 
+
+
+# References 
+[1] Brunsdon, C.; Fotheringham, A. S.; Charlton, M. Some Notes on Parametric Significance Tests for Geographically Weighted Regression. Journal of Regional Science 1999, 39 (3), 497–524. https://doi.org/10.1111/0022-4146.00146.
+
+[2] Tu, Y.; Wong, G. K. M. Prices in Singapore.
+
+[3] Li Junyi, D.; Muhammad, J. B. R.; Teo, R. ISSS608G11_SGSAS_ResearchPaper.pdf https://wiki.smu.edu.sg/1920t2isss608/img_auth.php/6/66/ISSS608G11_SGSAS_ResearchPaper.pdf (accessed Nov 26, 2020).
+
+[4] IMF Global Housing Watch https://www.imf.org/external/research/housing/ (accessed Nov 25, 2020).
+
+[5] Lu, B.; Charlton, M.; Harris, P.; Fotheringham, A. S. Geographically Weighted Regression with a Non-Euclidean Distance Metric: A Case Study Using Hedonic House Price Data. International Journal of Geographical Information Science 2014, 28 (4), 660–681. https://doi.org/10.1080/
+
+[6] Chin, D.; Lim, P.; Shi, J. EzModel: An Interactive Tool to Model HDB Resale Prices Using Mixed Geographically Weighted Regression. 12.
+
+[7] Bellefon, M.-P. D.; Floch, J.-M. 9. Geographically Weighted Regression. 24.
 
 
 
-
-
-
----
-references:
-- id: meier2012
-  title: Professinal Android 4 Application Development
-  author: 
-  - family: Meier
-    given: Reto
-  type: book
-  publisher: John Wiley & Sons, Inc.
-  issued:
-    year: 2012
-    month: 5
-- id: fenner2012a
-  title: One-click science marketing
-  author:
-  - family: Fenner
-    given: Martin
-  container-title: Nature Materials
-  volume: 11
-  URL: 'https://doi.org/10.1038/nmat3283'
-  DOI: 10.1038/nmat3283
-  issue: 4
-  publisher: Nature Publishing Group
-  page: 261-263
-  type: article-journal
-  issued:
-    year: 2012
-    month: 3
-...
 
