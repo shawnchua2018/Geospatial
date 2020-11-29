@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2020.11.26)  29 NOV 2020 16:02
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2020.11.26)  29 NOV 2020 16:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -465,30 +465,30 @@ File: ts1aer.fd
 LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <9> not available
 (Font)              Font shape `TS1/cmr/m/n' tried instead on input line 159.
 
-Underfull \hbox (badness 10000) in paragraph at lines 206--215
+Underfull \hbox (badness 10000) in paragraph at lines 204--213
 
  []
 
 <App Archite.png, id=82, 208.5975pt x 184.9455pt>
 File: App Archite.png Graphic file (type png)
 <use App Archite.png>
-Package pdftex.def Info: App Archite.png  used on input line 218.
+Package pdftex.def Info: App Archite.png  used on input line 216.
 (pdftex.def)             Requested size: 227.62204pt x 201.81517pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 228--230
+Underfull \hbox (badness 10000) in paragraph at lines 226--228
 
  []
 
 <Table.png, id=83, 210.28563pt x 96.86188pt>
 File: Table.png Graphic file (type png)
 <use Table.png>
-Package pdftex.def Info: Table.png  used on input line 233.
+Package pdftex.def Info: Table.png  used on input line 231.
 (pdftex.def)             Requested size: 227.62204pt x 104.84868pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 243--249
+Underfull \hbox (badness 10000) in paragraph at lines 241--247
 
  []
 
@@ -496,53 +496,53 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.249 
+l.247 
        [2pdfTeX warning (ext4): destination with the same identifier (name{figu
 re.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.249 
+l.247 
        <./App Archite.png>]
 <Eqn 1.png, id=100, 214.55156pt x 33.87656pt>
 File: Eqn 1.png Graphic file (type png)
 <use Eqn 1.png>
-Package pdftex.def Info: Eqn 1.png  used on input line 252.
+Package pdftex.def Info: Eqn 1.png  used on input line 250.
 (pdftex.def)             Requested size: 227.62204pt x 35.94049pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 262--270
+Underfull \hbox (badness 10000) in paragraph at lines 260--268
 
  []
 
 <function.png, id=101, 424.58624pt x 453.19313pt>
 File: function.png Graphic file (type png)
 <use function.png>
-Package pdftex.def Info: function.png  used on input line 273.
+Package pdftex.def Info: function.png  used on input line 271.
 (pdftex.def)             Requested size: 227.62204pt x 242.95728pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 277--282
+Underfull \hbox (badness 10000) in paragraph at lines 275--280
 
  []
 
 <continuous.png, id=102, 301.125pt x 76.78688pt>
 File: continuous.png Graphic file (type png)
 <use continuous.png>
-Package pdftex.def Info: continuous.png  used on input line 285.
+Package pdftex.def Info: continuous.png  used on input line 283.
 (pdftex.def)             Requested size: 227.62204pt x 58.04579pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 289--295
+Underfull \hbox (badness 10000) in paragraph at lines 287--293
 
  []
 
 <discontinuous.png, id=103, 457.71pt x 94.85437pt>
 File: discontinuous.png Graphic file (type png)
 <use discontinuous.png>
-Package pdftex.def Info: discontinuous.png  used on input line 298.
+Package pdftex.def Info: discontinuous.png  used on input line 296.
 (pdftex.def)             Requested size: 227.62204pt x 47.17087pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 302--316
+Underfull \hbox (badness 10000) in paragraph at lines 300--314
 
  []
 
@@ -550,72 +550,72 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.316 
+l.314 
        [3pdfTeX warning (ext4): destination with the same identifier (name{figu
 re.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.316 
+l.314 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.316 
+l.314 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.316 
+l.314 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 5}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.316 
+l.314 
        <./Table.PNG> <./Eqn 1.png> <./function.png> <./continuous.png> <./disco
 ntinuous.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 317--323
+Underfull \hbox (badness 10000) in paragraph at lines 315--321
 
  []
 
 <cv.png, id=112, 156.585pt x 54.9553pt>
 File: cv.png Graphic file (type png)
 <use cv.png>
-Package pdftex.def Info: cv.png  used on input line 326.
+Package pdftex.def Info: cv.png  used on input line 324.
 (pdftex.def)             Requested size: 227.62204pt x 79.8894pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 330--335
+Underfull \hbox (badness 10000) in paragraph at lines 328--333
 
  []
 
 <aac.png, id=113, 322.20375pt x 48.93282pt>
 File: aac.png Graphic file (type png)
 <use aac.png>
-Package pdftex.def Info: aac.png  used on input line 338.
+Package pdftex.def Info: aac.png  used on input line 336.
 (pdftex.def)             Requested size: 227.62204pt x 34.57005pt.
 
-Overfull \hbox (16.07756pt too wide) in paragraph at lines 367--367
+Overfull \hbox (16.07756pt too wide) in paragraph at lines 365--365
 []\secfnt Case 1: An-a-lyze per-for-mance of GWR Model 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 369--375
+Underfull \hbox (badness 10000) in paragraph at lines 367--373
 
  []
 
 <prox.png, id=114, 586.19pt x 483.30562pt>
 File: prox.png Graphic file (type png)
 <use prox.png>
-Package pdftex.def Info: prox.png  used on input line 381.
+Package pdftex.def Info: prox.png  used on input line 379.
 (pdftex.def)             Requested size: 227.62204pt x 187.66985pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 385--390
+Underfull \hbox (badness 10000) in paragraph at lines 383--388
 
  []
 
 <histogram.png, id=115, 949.5475pt x 365.86688pt>
 File: histogram.png Graphic file (type png)
 <use histogram.png>
-Package pdftex.def Info: histogram.png  used on input line 393.
+Package pdftex.def Info: histogram.png  used on input line 391.
 (pdftex.def)             Requested size: 227.62204pt x 87.70377pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -624,45 +624,45 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.396 
+l.394 
        [4pdfTeX warning (ext4): destination with the same identifier (name{figu
 re.6}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.396 
+l.394 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 7}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.396 
+l.394 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 8}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.396 
+l.394 
        <./cv.png> <./aac.png> <./prox.PNG>]
 <boxplot.png, id=126, 807.015pt x 273.52188pt>
 File: boxplot.png Graphic file (type png)
 <use boxplot.png>
-Package pdftex.def Info: boxplot.png  used on input line 399.
+Package pdftex.def Info: boxplot.png  used on input line 397.
 (pdftex.def)             Requested size: 227.62204pt x 77.14903pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 403--414
+Underfull \hbox (badness 10000) in paragraph at lines 401--412
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 415--418
+Underfull \hbox (badness 10000) in paragraph at lines 413--416
 
  []
 
 <setting.png, id=127, 757.83125pt x 415.5525pt>
 File: setting.png Graphic file (type png)
 <use setting.png>
-Package pdftex.def Info: setting.png  used on input line 421.
+Package pdftex.def Info: setting.png  used on input line 419.
 (pdftex.def)             Requested size: 227.62204pt x 124.81255pt.
 
-Overfull \hbox (1.6762pt too wide) in paragraph at lines 425--428
+Overfull \hbox (1.6762pt too wide) in paragraph at lines 423--426
 []\T1/aer/b/n/9 Next, Spa-tial Auto cor-re-la-tion among the resid-u-als are te
 sted
  []
@@ -670,27 +670,27 @@ sted
 <sa.png, id=128, 966.61125pt x 381.425pt>
 File: sa.png Graphic file (type png)
 <use sa.png>
-Package pdftex.def Info: sa.png  used on input line 431.
+Package pdftex.def Info: sa.png  used on input line 429.
 (pdftex.def)             Requested size: 227.62204pt x 89.8153pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 435--440
+Underfull \hbox (badness 10000) in paragraph at lines 433--438
 
  []
 
 <Results.png, id=129, 173.14688pt x 53.19875pt>
 File: Results.png Graphic file (type png)
 <use Results.png>
-Package pdftex.def Info: Results.png  used on input line 443.
+Package pdftex.def Info: Results.png  used on input line 441.
 (pdftex.def)             Requested size: 227.62204pt x 69.93762pt.
 <fixed.png, id=130, 832.61063pt x 303.1325pt>
 File: fixed.png Graphic file (type png)
 <use fixed.png>
-Package pdftex.def Info: fixed.png  used on input line 459.
+Package pdftex.def Info: fixed.png  used on input line 457.
 (pdftex.def)             Requested size: 227.62204pt x 82.86908pt.
 <results2.png, id=131, 805.0075pt x 337.26pt>
 File: results2.png Graphic file (type png)
 <use results2.png>
-Package pdftex.def Info: results2.png  used on input line 465.
+Package pdftex.def Info: results2.png  used on input line 463.
 (pdftex.def)             Requested size: 227.62204pt x 95.35846pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -699,57 +699,57 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.468 
+l.466 
        [5pdfTeX warning (ext4): destination with the same identifier (name{figu
 re.9}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.468 
+l.466 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 10}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.468 
+l.466 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 11}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.468 
+l.466 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 12}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.468 
+l.466 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 13}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.468 
+l.466 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 14}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.468 
+l.466 
        <./Histogram.PNG> <./boxplot.PNG> <./setting.PNG> <./sa.PNG> <./Results.
 PNG> <./fixed.PNG>]
-Underfull \hbox (badness 10000) in paragraph at lines 469--477
+Underfull \hbox (badness 10000) in paragraph at lines 467--475
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 483--488
+Underfull \hbox (badness 10000) in paragraph at lines 481--486
 
  []
 
 <bb.png, id=147, 310.761pt x 157.023pt>
 File: bb.png Graphic file (type png)
 <use bb.png>
-Package pdftex.def Info: bb.png  used on input line 491.
+Package pdftex.def Info: bb.png  used on input line 489.
 (pdftex.def)             Requested size: 227.62204pt x 115.01636pt.
 <bbo.png, id=148, 268.50313pt x 228.855pt>
 File: bbo.png Graphic file (type png)
 <use bbo.png>
-Package pdftex.def Info: bbo.png  used on input line 497.
+Package pdftex.def Info: bbo.png  used on input line 495.
 (pdftex.def)             Requested size: 227.62204pt x 194.01083pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -757,12 +757,12 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 <punggol.png, id=149, 345.2535pt x 164.907pt>
 File: punggol.png Graphic file (type png)
 <use punggol.png>
-Package pdftex.def Info: punggol.png  used on input line 509.
+Package pdftex.def Info: punggol.png  used on input line 507.
 (pdftex.def)             Requested size: 227.62204pt x 108.72067pt.
 <po.png, id=150, 264.48813pt x 227.85126pt>
 File: po.png Graphic file (type png)
 <use po.png>
-Package pdftex.def Info: po.png  used on input line 515.
+Package pdftex.def Info: po.png  used on input line 513.
 (pdftex.def)             Requested size: 227.62204pt x 196.09079pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -771,40 +771,40 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.518 
+l.516 
        [6pdfTeX warning (ext4): destination with the same identifier (name{figu
 re.15}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.518 
+l.516 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 16}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.518 
+l.516 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 17}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.518 
+l.516 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.
 18}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.518 
+l.516 
        <./results2.PNG> <./bb.png> <./bbo.png> <./punggol.png>]
-Overfull \hbox (9.16957pt too wide) in paragraph at lines 532--548
+Overfull \hbox (9.16957pt too wide) in paragraph at lines 530--546
 \T1/aer/b/n/9 them-selves and are able to quickly gen-er-ate the mod-els throug
 h
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 532--548
+Underfull \hbox (badness 10000) in paragraph at lines 530--546
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 549--556
+Underfull \hbox (badness 10000) in paragraph at lines 547--554
 
  []
 
@@ -831,9 +831,6 @@ Overfull \hbox (10.06593pt too wide) in paragraph at lines 615--618
 []\T1/aer/b/n/9 [7] Belle-fon, M.-P. D.; Floch, J.-M. 9. Ge-o-graph-i-cally Wei
 ghted
  []
-
-
-Underfull \vbox (badness 1337) has occurred while \output is active []
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
 een already used, duplicate ignored
@@ -878,7 +875,7 @@ ist/fonts/type1/urw/helvetic/uhvb8a.pfb><c:/Users/olivi/AppData/Roaming/TinyTeX
 /texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb><c:/Users/olivi/AppData/Roaming
 /TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb><c:/Users/olivi/AppData/Ro
 aming/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Research.pdf (8 pages, 2190227 bytes).
+Output written on Research.pdf (8 pages, 2190300 bytes).
 PDF statistics:
  304 PDF objects out of 1000 (max. 8388607)
  170 compressed objects within 2 object streams
