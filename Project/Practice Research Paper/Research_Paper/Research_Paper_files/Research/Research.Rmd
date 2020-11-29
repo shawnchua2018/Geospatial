@@ -117,7 +117,7 @@ development of the EzModel Application:\
 
 #### 4.2.2.1 __Geographically Weighted Regression__
 
-$patial makes use of the GWR model, a local statistical technique to analyze spatial variations in relationships where spatial non-stationary is assumed and tested by looking at the coefficients of the variables for each observation in the regression models. The GWR model is based on the “First law of Geography” where everything is related with everything else, but closer things are more related than remote ones and the resulting mathematical equation is expressed as such:\
+$patial makes use of the GWR model, a local statistical technique to analyze spatial variations in relationships where spatial non-stationary is assumed. The GWR model is based on the “First law of Geography” where everything is related with everything else, but closer things are more related than remote ones and the resulting mathematical equation is expressed as such:\
 
 \begin{figure}[H]
 \centering
